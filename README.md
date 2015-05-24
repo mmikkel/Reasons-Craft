@@ -8,7 +8,7 @@ _Supercharge your field layouts with conditionals._
 
 Reasons makes it possible to add simple conditionals in order to hide or show fields based on other fields' values. Its implementation is very much inspired by conditionals in Advanced Custom Fields for Wordpress.
 
-![Setting up conditionals using the built-in field layout designer](http://recordit.co/R7Ti1xpL9Q)
+![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)
 
 **Why? What about Entry Types and Matrix fields?**
 
