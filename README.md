@@ -6,13 +6,14 @@ _Supercharge your field layouts with conditionals._
 
 **What does Reasons do?**  
 
-Reasons makes it possible to add simple conditionals in order to hide or show fields based on other fields' values. Its implementation is very much inspired by conditionals in Advanced Custom Fields for Wordpress.
+Reasons makes it possible to add simple conditionals in order to hide or show fields based on other fields' values. Its implementation is very much inspired by Advanced Custom Fields for Wordpress.
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)
 
 **Why? What about Entry Types and Matrix fields?**
 
-Sure, I hear ya. When it comes to flexible content, Craft is pretty powerful – and the ability to create separate Entry Types or define a layout with Matrix fields is often the best way to go. Reasons basically offers a third and different option.  
+Sure, I hear ya. When it comes to flexible content, Craft is pretty powerful – and the ability to create separate Entry Types or define a layout with Matrix fields is often the best way to go. Reasons basically offers a third and different option, but I'd recommend to only use it for the fairly simple cases.  
+
 Compared to Entry Types and Matrix, Reasons is _purely_ about increasing usability in the editorial workflow. It works as a thin layer on top of Crafts UI, basically using Javascript to hide and show fields in the entry form as the editor does her magic. Reasons does absolutely nothing to your content, and it doesn't affect the frontend or the way your fields work in any way. In some cases, that's all you need.
 
 **What's a toggle field?**
