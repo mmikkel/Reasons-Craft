@@ -1,0 +1,37 @@
+{
+    // http://www.jshint.com/docs/options/
+
+    // Enforcing options
+    "boss": true,
+    "curly": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "es3": true,
+    "expr": true,
+    "immed": true,
+    "noarg": true,
+    "onevar": true,
+    "quotmark": "single",
+    "trailing": true,
+    "undef": false,
+    "unused": false,
+
+    // Relaxing options
+    "expr"     : true,
+    "laxbreak" : true,
+    "maxerr"   : 100,
+
+    // Environments
+    "browser"  : true,
+    "jquery"   : true,
+
+    "globals"   : {
+        "_": false,
+        "Backbone": false,
+        "jQuery": false,
+        "wp": false,
+        "require": false,
+        "module" : false,
+        "dk"     : false
+    }
+}
