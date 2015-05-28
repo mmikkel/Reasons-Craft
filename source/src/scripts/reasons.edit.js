@@ -7,17 +7,23 @@ if (typeof Reasons == 'undefined'){
     Reasons = {};
 }
 
-Reasons.EntryEdit = Garnish.Base.extend({
+Reasons.EditForm = Garnish.Base.extend({
 
     $container : null,
 
     init: function($container,settings)
     {
-        this.setSettings( settings, Reasons.EntryEdit.defaults );
+        this.setSettings( settings, Reasons.EditForm.defaults );
         this.$container = $container;
+
+        this.elementType;
 
         // Get section ID
         this.sectionId = this.$container.find('input[name="sectionId"]').val();
+
+        if(this.sectionId){
+            this.elementType = 'entries';
+        }
 
         // Get entry type ID
         this.$entryTypeSelect = $(this.settings.entryTypeSelectSelector);
@@ -40,13 +46,16 @@ Reasons.EntryEdit = Garnish.Base.extend({
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
 
         this.render();
+
+        console.log('edit form init. section id:', this.sectionId);
         
     },
 
     render : function()
     {
-        this.initToggleFields();
-        this.evaluateConditionals();
+        if(this.initToggleFields()){
+            this.evaluateConditionals();
+        }
     },
 
     initToggleFields : function()
@@ -98,6 +107,8 @@ Reasons.EntryEdit = Garnish.Base.extend({
                 $field.attr('data-toggle',1);
             }
         });
+
+        return true;
 
     },
 

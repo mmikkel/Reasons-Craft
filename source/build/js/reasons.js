@@ -1007,17 +1007,23 @@ if (typeof Reasons == 'undefined'){
     Reasons = {};
 }
 
-Reasons.EntryEdit = Garnish.Base.extend({
+Reasons.EditForm = Garnish.Base.extend({
 
     $container : null,
 
     init: function($container,settings)
     {
-        this.setSettings( settings, Reasons.EntryEdit.defaults );
+        this.setSettings( settings, Reasons.EditForm.defaults );
         this.$container = $container;
+
+        this.elementType;
 
         // Get section ID
         this.sectionId = this.$container.find('input[name="sectionId"]').val();
+
+        if(this.sectionId){
+            this.elementType = 'entries';
+        }
 
         // Get entry type ID
         this.$entryTypeSelect = $(this.settings.entryTypeSelectSelector);
@@ -1040,13 +1046,16 @@ Reasons.EntryEdit = Garnish.Base.extend({
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
 
         this.render();
+
+        console.log('edit form init. section id:', this.sectionId);
         
     },
 
     render : function()
     {
-        this.initToggleFields();
-        this.evaluateConditionals();
+        if(this.initToggleFields()){
+            this.evaluateConditionals();
+        }
     },
 
     initToggleFields : function()
@@ -1098,6 +1107,8 @@ Reasons.EntryEdit = Garnish.Base.extend({
                 $field.attr('data-toggle',1);
             }
         });
+
+        return true;
 
     },
 
@@ -1481,7 +1492,7 @@ $.extend(Reasons,{
 
 		// Where are we?
 		var segments = Craft.path.split('/');
-		if (segments[0] === 'settings' && segments[1] === 'sections') {
+		if (segments && segments[0] && segments[0] === 'settings' && segments[1] === 'sections') {
 			
 			// Ok, so we're dealing with sections and/or entry types. That's good.
 			if (Craft.path.indexOf('entrytypes/') > -1){
@@ -1505,18 +1516,32 @@ $.extend(Reasons,{
 				return false;
 			}
 
-		} else if (segments[0] === 'entries' && segments.length > 2) {
-			
-			// So we're editing an entry
-			var $entryForm = $('#entry-form');
-			if ($entryForm.length === 0){
+		} else {
+
+			var $editForm = false;
+
+			switch (segments[0])
+			{
+				case 'entries':
+					$editForm = $('#entry-form');
+					break;
+
+				// case 'categories':
+				// 	$editForm = $('#category-form');
+				// 	break;
+
+				// case 'users':
+				// 	$editForm = $('#userform');
+				// 	break;
+
+			}
+
+			if (!$editForm || $editForm.length === 0){
 				return false;
 			}
-			
-			new Reasons.EntryEdit($entryForm);
 
-		} else {
-			return false;
+			new Reasons.EditForm($editForm);
+
 		}
 
 	},

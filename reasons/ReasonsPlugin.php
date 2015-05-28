@@ -14,7 +14,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected   $_version = '0.1',
+    protected   $_version = '0.1.1',
                 $_developer = 'Mats Mikkel Rummelhoff',
                 $_developerUrl = 'http://mmikkel.no',
                 $_pluginName = 'Reasons',
@@ -57,15 +57,8 @@ class ReasonsPlugin extends BasePlugin
             return false;
         }
 
-        // Where are we?
-        $segments = craft()->request->segments;
-        if (
-            ($segments[0] === 'settings' && $segments[1] === 'sections')
-            || ($segments[0] === 'entries')
-        ){
-            $this->includeResources();
-            $this->addEventListeners();        
-        }
+        $this->includeResources();
+        $this->addEventListeners();
 
     }
 

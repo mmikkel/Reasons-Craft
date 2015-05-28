@@ -22,7 +22,7 @@ $.extend(Reasons,{
 
 		// Where are we?
 		var segments = Craft.path.split('/');
-		if (segments[0] === 'settings' && segments[1] === 'sections') {
+		if (segments && segments[0] && segments[0] === 'settings' && segments[1] === 'sections') {
 			
 			// Ok, so we're dealing with sections and/or entry types. That's good.
 			if (Craft.path.indexOf('entrytypes/') > -1){
@@ -46,18 +46,32 @@ $.extend(Reasons,{
 				return false;
 			}
 
-		} else if (segments[0] === 'entries' && segments.length > 2) {
-			
-			// So we're editing an entry
-			var $entryForm = $('#entry-form');
-			if ($entryForm.length === 0){
+		} else {
+
+			var $editForm = false;
+
+			switch (segments[0])
+			{
+				case 'entries':
+					$editForm = $('#entry-form');
+					break;
+
+				// case 'categories':
+				// 	$editForm = $('#category-form');
+				// 	break;
+
+				// case 'users':
+				// 	$editForm = $('#userform');
+				// 	break;
+
+			}
+
+			if (!$editForm || $editForm.length === 0){
 				return false;
 			}
-			
-			new Reasons.EntryEdit($entryForm);
 
-		} else {
-			return false;
+			new Reasons.EditForm($editForm);
+
 		}
 
 	},

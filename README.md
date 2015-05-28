@@ -1,4 +1,5 @@
 # Reasons 
+## v. 0.1.1
 
 _Supercharge your field layouts with conditionals._  
 
@@ -54,6 +55,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are very welcome!**
 
 ### Changelog
+
+#### 0.1.1
+
+* Fixed _undefined index_ related bug
 
 #### 0.1
 
