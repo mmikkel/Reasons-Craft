@@ -135,7 +135,6 @@ class ReasonsService extends BaseApplicationComponent
 			'Checkboxes',
 			'MultiSelect',
 			'RadioButtons',
-			//'Color',
 			'Number',
 			'PositionSelect',
 			'PlainText',
@@ -144,7 +143,10 @@ class ReasonsService extends BaseApplicationComponent
 		$fields = craft()->fields->getAllFields();
 		foreach($fields as $field){
 			$fieldType = $field->getFieldType();
-			$classHandle = $fieldType->classHandle;
+			$classHandle = $fieldType->classHandle ?: false;
+			if (!$classHandle) {
+				continue;
+			}
 			if (in_array($classHandle, $toggleFieldTypes)) {
 				$toggleFields[] = array(
 					'id' => $field->id,
