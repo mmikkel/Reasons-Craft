@@ -16,9 +16,7 @@ class ReasonsController extends BaseController
 
 	public function actionSaveForCategoryGroup(array $variables = array())
 	{
-
 		$this->requirePostRequest();
-
 	}
 
 }

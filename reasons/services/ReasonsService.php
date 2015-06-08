@@ -143,7 +143,7 @@ class ReasonsService extends BaseApplicationComponent
 		$fields = craft()->fields->getAllFields();
 		foreach($fields as $field){
 			$fieldType = $field->getFieldType();
-			$classHandle = $fieldType->classHandle ?: false;
+			$classHandle = $fieldType && is_object($fieldType) && $fieldType->classHandle ? $fieldType->classHandle : false;
 			if (!$classHandle) {
 				continue;
 			}
