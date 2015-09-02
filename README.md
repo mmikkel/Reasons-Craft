@@ -1,5 +1,5 @@
 # Reasons 
-## v. 0.1.2
+## v. 0.1.3
 
 _Supercharge your field layouts with conditionals._  
 
