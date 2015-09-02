@@ -58,6 +58,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 
 #### 0.1.2
 
+* Custom field type bugfix
+
+#### 0.1.2
+
 * Bugfix
 
 #### 0.1.1
