@@ -56,7 +56,7 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 
 ### Changelog
 
-#### 0.1.2
+#### 0.1.3
 
 * Custom field type bugfix
 
