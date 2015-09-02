@@ -1093,18 +1093,22 @@ Reasons.EditForm = Garnish.Base.extend({
 
         this.$fields.each(function(){
             $field = $(this);
-            fieldHandle = $field.attr('id').split('-')[1] || false;
-            fieldId = Reasons.getFieldIdByHandle(fieldHandle);
-            if (fieldId){
-                $field.attr('data-id',fieldId);
-            }
-            // Is this a target field?
-            if (self.conditionals[fieldId]){
-                $field.attr('data-target',1);
-            }
-            // Is this a toggle field
-            if (toggleFieldIds.indexOf(parseInt(fieldId)) > -1){
-                $field.attr('data-toggle',1);
+            fieldIdAttr = $field.attr('id');
+            if( typeof fieldIdAttr !== typeof undefined && fieldIdAttr !== false )
+            {
+                fieldHandle = fieldIdAttr.split('-')[1] || false;
+                fieldId = Reasons.getFieldIdByHandle(fieldHandle);
+                if (fieldId){
+                    $field.attr('data-id',fieldId);
+                }
+                // Is this a target field?
+                if (self.conditionals[fieldId]){
+                    $field.attr('data-target',1);
+                }
+                // Is this a toggle field
+                if (toggleFieldIds.indexOf(parseInt(fieldId)) > -1){
+                    $field.attr('data-toggle',1);
+                }
             }
         });
 
