@@ -75,10 +75,10 @@ class ReasonsPlugin extends BasePlugin
     protected function includeResources()
     {
 
-        $isDevMode = craft()->config->get('devMode');
-
-        // Where are we?
+        // Include relevant resources based on the request path
         $path = craft()->request->path;
+        $target = false;
+
         if (preg_match('/^settings\/sections\/[0-9]\/entrytypes\/([0-9]|new)/', $path)) {
             // Field Layout designer
             craft()->templates->includeJsResource('reasons/javascripts/FLD.js');
@@ -90,14 +90,14 @@ class ReasonsPlugin extends BasePlugin
             return false;
         }
 
-        // Reasons data payload
+        // Reasons data. TODO: Could stand to be optimized!
         $data = json_encode(array(
             'conditionals' => craft()->reasons->getAllConditionals(),
             'toggleFields' => craft()->reasons->getToggleFields(),
             'entryTypeIds' => craft()->reasons->getEntryTypeIds(),
             'fieldIds' => craft()->reasons->getFieldIds(),
-            'noToggleFieldsMessage' => Craft::t('No toggle fields available.'),
         ));
+
         craft()->templates->includeCssResource('reasons/stylesheets/reasons.css');
         craft()->templates->includeJs('window._ReasonsData='.$data.';console.log("data set");');
 

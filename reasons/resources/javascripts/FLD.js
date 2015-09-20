@@ -56,6 +56,10 @@
 	
 	var Reasons = exports;
 	
+	$(function () {
+	    Reasons.data = window._ReasonsData || false;
+	});
+	
 	Reasons.getToggleFields = function () {
 	    return Reasons.data.toggleFields || [];
 	};
@@ -70,7 +74,9 @@
 	        }
 	    }
 	    return false;
-	}, Reasons.getConditionalsDataByEntryTypeId = function (entryTypeId) {
+	};
+	
+	Reasons.getConditionalsDataByEntryTypeId = function (entryTypeId) {
 	    var conditionals;
 	    for (var i = 0; i < Reasons.data.conditionals.length; ++i) {
 	        conditionals = Reasons.data.conditionals[i];
@@ -79,15 +85,15 @@
 	        }
 	    }
 	    return false;
-	}, Reasons.getEntryTypeIdsBySectionId = function (sectionId) {
-	    return Reasons.data.entryTypeIds && Reasons.data.entryTypeIds.hasOwnProperty(sectionId) ? Reasons.data.entryTypeIds[sectionId] : false;
-	}, Reasons.getFieldIdByHandle = function (fieldHandle) {
-	    return Reasons.data.fieldIds && Reasons.data.fieldIds.hasOwnProperty(fieldHandle) ? Reasons.data.fieldIds[fieldHandle] : false;
 	};
 	
-	$(function () {
-	    Reasons.data = window._ReasonsData || false;
-	});
+	Reasons.getEntryTypeIdsBySectionId = function (sectionId) {
+	    return Reasons.data.entryTypeIds && Reasons.data.entryTypeIds.hasOwnProperty(sectionId) ? Reasons.data.entryTypeIds[sectionId] : false;
+	};
+	
+	Reasons.getFieldIdByHandle = function (fieldHandle) {
+	    return Reasons.data.fieldIds && Reasons.data.fieldIds.hasOwnProperty(fieldHandle) ? Reasons.data.fieldIds[fieldHandle] : false;
+	};
 
 /***/ },
 /* 3 */
@@ -96,13 +102,12 @@
 	'use strict';
 	
 	var Reasons = __webpack_require__(2);
+	
 	Reasons.Builder = __webpack_require__(4);
 	
 	Reasons.FLD = {
 	
 	    settings: {
-	        id: null,
-	        conditionals: null,
 	        fieldLayoutFormSelector: '#fieldlayoutform',
 	        formSelector: 'form:first',
 	        fieldSettingsSelector: 'a.settings',
@@ -118,31 +123,43 @@
 	        this.$form = this.$container.parents(this.settings.formSelector);
 	        if (this.$form.length === 0) return false;
 	
-	        // Create some hidden input fields
-	        this.$conditionalsInput = $(this.templates.input({
-	            name: '_reasons',
-	            type: 'hidden'
-	        }));
-	        this.$conditionalsIdInput = $(this.templates.input({
-	            name: '_reasonsId',
-	            value: this.settings.id,
-	            type: 'hidden'
-	        }));
-	        this.$form.append(this.$conditionalsInput).append(this.$conditionalsIdInput)
-	        // Attach submit event listener
-	        .on('submit', $.proxy(this.onFormSubmit, this));
+	        // Get database ID and initial conditionals
+	        var entryTypeId = parseInt(Craft.path.substring(Craft.path.indexOf('entrytypes/')).split('/')[1]) || 'new',
+	            conditionalsData = Reasons.getConditionalsDataByEntryTypeId(entryTypeId);
+	        if (conditionalsData) {
+	            this.id = conditionalsData.id;
+	            this.conditionals = conditionalsData.conditionals;
+	        }
 	
-	        // Get toggle field IDs
+	        // Get available toggle field IDs
 	        var self = this;
 	        this.toggleFieldIds = [];
 	        $.map(Reasons.getToggleFields(), function (toggleField) {
 	            self.toggleFieldIds.push(parseInt(toggleField.id));
 	        });
 	
+	        // This hidden input will store our serialized conditionals
+	        this.$conditionalsInput = $(this.templates.input({
+	            name: '_reasons',
+	            type: 'hidden'
+	        }));
+	
+	        // This hidden input stores the conditional's ID
+	        this.$conditionalsIdInput = $(this.templates.input({
+	            name: '_reasonsId',
+	            value: this.id || '',
+	            type: 'hidden'
+	        }));
+	
+	        // Append the hidden input fields
+	        this.$form.append(this.$conditionalsInput).append(this.$conditionalsIdInput)
+	        // Attach submit event listener
+	        .on('submit', $.proxy(this.onFormSubmit, this));
+	
 	        // Defer refresh
 	        setTimeout($.proxy(this.refresh, this), 0);
 	
-	        // Make sure stuff is kept up to date when fields move around
+	        // Hack time. Make sure stuff is kept up to date when fields move around
 	        this.$container.on('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
 	    },
 	
@@ -186,7 +203,7 @@
 	                    $field.data('_reasonsBuilder', new Reasons.Builder({
 	                        fieldId: fieldId,
 	                        toggleFields: toggleFields,
-	                        rules: self.settings.conditionals && self.settings.conditionals.hasOwnProperty(fieldId) ? self.settings.conditionals[fieldId] : null
+	                        rules: self.conditionals && self.conditionals.hasOwnProperty(fieldId) ? self.conditionals[fieldId] : null
 	                    }));
 	                } else {
 	
@@ -406,7 +423,7 @@
 	        // If no toggle fields, GTFO
 	        if (toggleFields.length === 0) {
 	            this.disable();
-	            this.$message.text(Reasons.settings.noToggleFieldsMessage);
+	            this.$message.text(Craft.t('No toggle fields available.'));
 	            return false;
 	        } else {
 	            this.enable();

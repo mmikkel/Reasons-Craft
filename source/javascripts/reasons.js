@@ -1,8 +1,12 @@
 var Reasons = exports;
 
+$(function(){
+    Reasons.data = window._ReasonsData || false;
+});
+
 Reasons.getToggleFields = function () {
     return Reasons.data.toggleFields || [];
-}
+};
 
 Reasons.getToggleFieldById = function(fieldId)
 {
@@ -15,7 +19,7 @@ Reasons.getToggleFieldById = function(fieldId)
         }
     }
     return false;
-},
+};
 
 Reasons.getConditionalsDataByEntryTypeId = function(entryTypeId)
 {
@@ -27,18 +31,14 @@ Reasons.getConditionalsDataByEntryTypeId = function(entryTypeId)
         }
     }
     return false;
-},
+};
 
 Reasons.getEntryTypeIdsBySectionId = function(sectionId)
 {
     return Reasons.data.entryTypeIds && Reasons.data.entryTypeIds.hasOwnProperty(sectionId) ? Reasons.data.entryTypeIds[sectionId] : false;
-},
+};
 
 Reasons.getFieldIdByHandle = function(fieldHandle)
 {
     return Reasons.data.fieldIds && Reasons.data.fieldIds.hasOwnProperty(fieldHandle) ? Reasons.data.fieldIds[fieldHandle] : false;
-}
-
-$(function(){
-    Reasons.data = window._ReasonsData || false;
-});
+};

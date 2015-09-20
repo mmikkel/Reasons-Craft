@@ -261,6 +261,10 @@
 	
 	var Reasons = exports;
 	
+	$(function () {
+	    Reasons.data = window._ReasonsData || false;
+	});
+	
 	Reasons.getToggleFields = function () {
 	    return Reasons.data.toggleFields || [];
 	};
@@ -275,7 +279,9 @@
 	        }
 	    }
 	    return false;
-	}, Reasons.getConditionalsDataByEntryTypeId = function (entryTypeId) {
+	};
+	
+	Reasons.getConditionalsDataByEntryTypeId = function (entryTypeId) {
 	    var conditionals;
 	    for (var i = 0; i < Reasons.data.conditionals.length; ++i) {
 	        conditionals = Reasons.data.conditionals[i];
@@ -284,15 +290,15 @@
 	        }
 	    }
 	    return false;
-	}, Reasons.getEntryTypeIdsBySectionId = function (sectionId) {
-	    return Reasons.data.entryTypeIds && Reasons.data.entryTypeIds.hasOwnProperty(sectionId) ? Reasons.data.entryTypeIds[sectionId] : false;
-	}, Reasons.getFieldIdByHandle = function (fieldHandle) {
-	    return Reasons.data.fieldIds && Reasons.data.fieldIds.hasOwnProperty(fieldHandle) ? Reasons.data.fieldIds[fieldHandle] : false;
 	};
 	
-	$(function () {
-	    Reasons.data = window._ReasonsData || false;
-	});
+	Reasons.getEntryTypeIdsBySectionId = function (sectionId) {
+	    return Reasons.data.entryTypeIds && Reasons.data.entryTypeIds.hasOwnProperty(sectionId) ? Reasons.data.entryTypeIds[sectionId] : false;
+	};
+	
+	Reasons.getFieldIdByHandle = function (fieldHandle) {
+	    return Reasons.data.fieldIds && Reasons.data.fieldIds.hasOwnProperty(fieldHandle) ? Reasons.data.fieldIds[fieldHandle] : false;
+	};
 
 /***/ }
 /******/ ]);

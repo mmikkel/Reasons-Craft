@@ -7,7 +7,7 @@ module.exports = Garnish.Base.extend({
     init: function(settings)
     {
 
-        this.setSettings( settings, Reasons.Builder.defaults );
+        this.setSettings(settings, Reasons.Builder.defaults);
 
         this.templates = this.settings.templates;
         this.fieldId = this.settings.fieldId;
@@ -27,12 +27,12 @@ module.exports = Garnish.Base.extend({
 
         // Add some event listeners
         this.$container
-            .on( 'click', '.reasonsAddRule', $.proxy( this.onReasonsAddRuleClick, this ) )
-            .on( 'click', '.reasonsRemoveRule', $.proxy( this.onReasonsRemoveRuleClick, this ) )
-            .on( 'click', '.reasonsAddStatement', $.proxy( this.onReasonsAddStatementClick, this ) )
-            .on( 'change', '.reasonsRuleToggleField select', $.proxy( this.onReasonsRuleToggleFieldChange, this ) )
-            .on( 'change', '.reasonsRuleCompare select', $.proxy( this.onReasonsRuleCompareChange, this ) )
-            .on( 'change', '.reasonsRuleValue *:input', $.proxy( this.onReasonsRuleValueChange, this ) );
+            .on('click', '.reasonsAddRule', $.proxy(this.onReasonsAddRuleClick, this))
+            .on('click', '.reasonsRemoveRule', $.proxy(this.onReasonsRemoveRuleClick, this))
+            .on('click', '.reasonsAddStatement', $.proxy(this.onReasonsAddStatementClick, this))
+            .on('change', '.reasonsRuleToggleField select', $.proxy(this.onReasonsRuleToggleFieldChange, this))
+            .on('change', '.reasonsRuleCompare select', $.proxy(this.onReasonsRuleCompareChange, this))
+            .on('change', '.reasonsRuleValue *:input', $.proxy(this.onReasonsRuleValueChange, this));
 
         // Clean out the builder
         this.$builder.html('');
@@ -74,7 +74,7 @@ module.exports = Garnish.Base.extend({
     {
 
         // Set new settings
-        this.setSettings( settings, this.settings );
+        this.setSettings(settings, this.settings);
 
         // Set new toggle fields
         this.setToggleFields(this.settings.toggleFields);
@@ -84,7 +84,7 @@ module.exports = Garnish.Base.extend({
 
     },
 
-    setToggleFields : function ( toggleFields )
+    setToggleFields : function (toggleFields)
     {
 
         this.settings.toggleFields = [];
@@ -116,7 +116,7 @@ module.exports = Garnish.Base.extend({
         // If no toggle fields, GTFO
         if (toggleFields.length === 0){
             this.disable();
-            this.$message.text(Reasons.settings.noToggleFieldsMessage);
+            this.$message.text(Craft.t('No toggle fields available.'));
             return false;
         } else {
             this.enable();
@@ -134,15 +134,15 @@ module.exports = Garnish.Base.extend({
             toggleSelectOpts,
             toggleFieldId;
 
-        $statements.each( function () {
+        $statements.each(function () {
 
             statement = [];
             $statement = $(this);
             $rules = $statement.find('.reasonsRule');
 
-            $rules.each( function () {
+            $rules.each(function () {
 
-                $rule = $( this );
+                $rule = $(this);
 
                 $toggleSelect = $rule.find('.reasonsRuleToggleField select');
                 toggleSelectValue = parseInt($toggleSelect.val());
@@ -161,13 +161,13 @@ module.exports = Garnish.Base.extend({
                 $toggleSelect.html(toggleSelectOpts);
 
                 // Create the rule
-                statement.push( {
+                statement.push({
                     fieldId : toggleSelectValue,
                     compare : $rule.find('.reasonsRuleCompare select').val(),
                     value : $rule.find('.reasonsRuleValue *:input:first').val()
-                } );
+                });
 
-            } );
+            });
 
             // Remove empty statements
             if (statement.length === 0) {
@@ -175,9 +175,9 @@ module.exports = Garnish.Base.extend({
                 return;
             }
 
-            self.settings.rules.push( statement );
+            self.settings.rules.push(statement);
 
-        } );
+        });
 
     },
 
@@ -228,7 +228,7 @@ module.exports = Garnish.Base.extend({
             value : null
         },settings);
 
-        var $rule = this.$rule.clone( true ),
+        var $rule = this.$rule.clone(true),
             $target = settings.target || this.$builder.find('.reasonsStatement:last'),
             fieldId = settings.fieldId,
             compare = settings.compare,
@@ -290,42 +290,42 @@ module.exports = Garnish.Base.extend({
         });
     },
 
-    onReasonsRemoveRuleClick : function ( e )
+    onReasonsRemoveRuleClick : function (e)
     {
         e.preventDefault();
-        var $target = $( e.currentTarget ),
+        var $target = $(e.currentTarget),
             $rule = $target.parents('.reasonsRule');
         $rule.remove();
         this.refresh();
     },
 
-    onReasonsAddStatementClick : function ( e ) {
+    onReasonsAddStatementClick : function (e) {
         e.preventDefault();
         this.addStatement();
     },
 
-    onReasonsRuleToggleFieldChange : function ( e ) {
+    onReasonsRuleToggleFieldChange : function (e) {
 
         e.preventDefault();
 
         // Render toggle value
-        var $target = $( e.currentTarget ),
-            $rule = $target.parents( '.reasonsRule' ),
-            $ruleValue = $rule.find( '.reasonsRuleValue' ),
+        var $target = $(e.currentTarget),
+            $rule = $target.parents('.reasonsRule'),
+            $ruleValue = $rule.find('.reasonsRuleValue'),
             toggleFieldId = $target.val(),
             toggleField = Reasons.getToggleFieldById(toggleFieldId),
             toggleFieldType = toggleField.type,
             toggleFieldSettings = toggleField.settings,
             ruleValueContent = '';
 
-        switch ( toggleFieldType ) {
+        switch (toggleFieldType) {
 
             // Lightswitch - true/false
             case 'Lightswitch' :
-                ruleValueContent = this.templates.select( [
-                    { true : Craft.t( 'on' ) },
-                    { false : Craft.t( 'off' ) }
-                ] );
+                ruleValueContent = this.templates.select([
+                    { true : Craft.t('on') },
+                    { false : Craft.t('off') }
+                ]);
                 break;
 
             // Option based inputs
@@ -338,7 +338,7 @@ module.exports = Garnish.Base.extend({
                     option[values[i].value] = values[i].label;
                     options.push(option);
                 }
-                ruleValueContent = this.templates.select( options );
+                ruleValueContent = this.templates.select(options);
                 break;
 
             // Number input
@@ -359,12 +359,12 @@ module.exports = Garnish.Base.extend({
                 var values = toggleFieldSettings.options,
                     options = [],
                     option;
-                for ( var i = 0; i < values.length; ++i ) {
+                for (var i = 0; i < values.length; ++i) {
                     option = {};
-                    option[values[ i ]] = values[ i ].charAt( 0 ).toUpperCase() + values[ i ].slice( 1 );
+                    option[values[ i ]] = values[ i ].charAt(0).toUpperCase() + values[ i ].slice(1);
                     options.push(option);
                 }
-                ruleValueContent = this.templates.select( options );
+                ruleValueContent = this.templates.select(options);
                 break;
 
             // Just render a plain text input for anything else
@@ -376,12 +376,12 @@ module.exports = Garnish.Base.extend({
 
     },
 
-    onReasonsRuleCompareChange : function ( e )
+    onReasonsRuleCompareChange : function (e)
     {
         e.preventDefault();
     },
 
-    onReasonsRuleValueChange : function ( e )
+    onReasonsRuleValueChange : function (e)
     {
         e.preventDefault();
     }
@@ -403,9 +403,9 @@ module.exports = Garnish.Base.extend({
                     option = options[i];
                     value = Object.keys(option)[0];
                     label = option[value];
-                    selectOptions.push( '<option value="' + value + '">' + label + '</option>' );
+                    selectOptions.push('<option value="' + value + '">' + label + '</option>');
                 }
-                return '<div class="select"><select>' + selectOptions.join( '' ) + '</select></div>';
+                return '<div class="select"><select>' + selectOptions.join('') + '</select></div>';
             },
             toggleSelectOption : function(toggleField, selected)
             {
