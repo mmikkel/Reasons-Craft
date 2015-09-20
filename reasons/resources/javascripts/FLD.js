@@ -56,7 +56,7 @@
 	
 	var Reasons = exports;
 	
-	$(function () {
+	if (window.$) $(function () {
 	    Reasons.data = window._ReasonsData || false;
 	});
 	
@@ -311,7 +311,7 @@
 	
 	};
 	
-	$(function () {
+	if (window.$) $(function () {
 	    Reasons.FLD.init();
 	});
 

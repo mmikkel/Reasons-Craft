@@ -237,9 +237,6 @@
 	                            break;
 	                    }
 	
-	                    console.log('toggle', toggleFieldValue, 'rule', rule.value, rule.compare);
-	                    console.log('----');
-	
 	                    if (!statementValid) {
 	                        numValidStatements--;
 	                        break;
@@ -271,7 +268,7 @@
 	
 	};
 	
-	$(function () {
+	if (window.$) $(function () {
 	    Reasons.EditForm.init();
 	});
 
@@ -283,7 +280,7 @@
 	
 	var Reasons = exports;
 	
-	$(function () {
+	if (window.$) $(function () {
 	    Reasons.data = window._ReasonsData || false;
 	});
 	

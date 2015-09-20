@@ -196,9 +196,6 @@ Reasons.EditForm = {
                                 break;
                         }
 
-                        console.log('toggle',toggleFieldValue,'rule',rule.value,rule.compare);
-                        console.log('----');
-
                         if (!statementValid) {
                             numValidStatements--;
                             break;
@@ -236,6 +233,4 @@ Reasons.EditForm = {
 
 };
 
-$(function(){
-    Reasons.EditForm.init();
-});
+if (window.$) $(function(){ Reasons.EditForm.init(); });

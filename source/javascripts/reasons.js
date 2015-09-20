@@ -1,8 +1,6 @@
 var Reasons = exports;
 
-$(function(){
-    Reasons.data = window._ReasonsData || false;
-});
+if (window.$) $(function(){ Reasons.data = window._ReasonsData || false; });
 
 Reasons.getToggleFields = function () {
     return Reasons.data.toggleFields || [];

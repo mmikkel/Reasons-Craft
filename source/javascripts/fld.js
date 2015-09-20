@@ -239,6 +239,4 @@ Reasons.FLD = {
 
 };
 
-$(function(){
-    Reasons.FLD.init();
-});
+if (window.$) $(function(){ Reasons.FLD.init(); });

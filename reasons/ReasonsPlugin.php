@@ -99,7 +99,7 @@ class ReasonsPlugin extends BasePlugin
         ));
 
         craft()->templates->includeCssResource('reasons/stylesheets/reasons.css');
-        craft()->templates->includeJs('window._ReasonsData='.$data.';console.log("data set");');
+        craft()->templates->includeJs('window._ReasonsData='.$data.';');
 
     }
 
