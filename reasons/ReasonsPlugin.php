@@ -77,18 +77,33 @@ class ReasonsPlugin extends BasePlugin
 
         // Include relevant resources based on the request path
         $path = craft()->request->path;
-        $target = false;
 
-        if (preg_match('/^settings\/sections\/[0-9]\/entrytypes\/([0-9]|new)/', $path)) {
-            // Field Layout designer
-            craft()->templates->includeJsResource('reasons/javascripts/FLD.js');
+        if (preg_match('/^settings\/sections\/[0-9]\/entrytypes\/([0-9]|new)/', $path))
+        {
+            $target = 'entrytype';
         }
-        else if (preg_match('/^entries\/.*\/([0-9]|new)/', $path)) {
-            // Edit entry
-            craft()->templates->includeJsResource('reasons/javascripts/EditForm.js');
+        else if (preg_match('/^entries\/.*\/([0-9]|new)/', $path))
+        {
+            $target = 'entry';
         } else {
             return false;
         }
+
+        // Get revision manifest
+        $manifestPath = dirname(__FILE__) . '/resources/rev-manifest.json';
+        $manifest = (file_exists($manifestPath) && $manifest = file_get_contents($manifestPath)) ? json_decode($manifest) : false;
+
+        switch ($target)
+        {
+            case 'entry' :
+                $url = 'javascripts/EditForm.js';
+                break;
+            case 'entrytype' :
+                $url = 'javascripts/FLD.js';
+                break;
+        }
+
+        craft()->templates->includeJsResource('reasons/' . ($manifest ? $manifest->$url : $url));
 
         // Reasons data. TODO: Could stand to be optimized!
         $data = json_encode(array(
@@ -98,7 +113,8 @@ class ReasonsPlugin extends BasePlugin
             'fieldIds' => craft()->reasons->getFieldIds(),
         ));
 
-        craft()->templates->includeCssResource('reasons/stylesheets/reasons.css');
+        $commonCss = 'stylesheets/reasons.css';
+        craft()->templates->includeCssResource('reasons/' . ($manifest ? $manifest->$commonCss : $commonCss));
         craft()->templates->includeJs('window._ReasonsData='.$data.';');
 
     }
