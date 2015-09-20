@@ -338,7 +338,7 @@ module.exports = Garnish.Base.extend({
                     option[values[i].value] = values[i].label;
                     options.push(option);
                 }
-                ruleValueContent = this.templates.select(options);
+                ruleValueContent = this.templates.select(options, (toggleFieldType === 'MultiSelect' || toggleFieldType === 'Checkboxes'));
                 break;
 
             // Number input
@@ -393,7 +393,7 @@ module.exports = Garnish.Base.extend({
         toggleFields : null,
         rules : null,
         templates : {
-            select : function(options)
+            select : function(options,isMultiSelect)
             {
                 var selectOptions = [],
                     option,
@@ -405,7 +405,7 @@ module.exports = Garnish.Base.extend({
                     label = option[value];
                     selectOptions.push('<option value="' + value + '">' + label + '</option>');
                 }
-                return '<div class="select"><select>' + selectOptions.join('') + '</select></div>';
+                return '<div class="' + (isMultiSelect ? 'multiselect' : 'select') + '"><select' + (isMultiSelect ? ' multiple' : '') + '>' + selectOptions.join('') + '</select></div>';
             },
             toggleSelectOption : function(toggleField, selected)
             {

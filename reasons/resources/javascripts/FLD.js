@@ -629,7 +629,7 @@
 	                    option[values[i].value] = values[i].label;
 	                    options.push(option);
 	                }
-	                ruleValueContent = this.templates.select(options);
+	                ruleValueContent = this.templates.select(options, toggleFieldType === 'MultiSelect' || toggleFieldType === 'Checkboxes');
 	                break;
 	
 	            // Number input
@@ -680,7 +680,7 @@
 	        toggleFields: null,
 	        rules: null,
 	        templates: {
-	            select: function select(options) {
+	            select: function select(options, isMultiSelect) {
 	                var selectOptions = [],
 	                    option,
 	                    value,
@@ -691,7 +691,7 @@
 	                    label = option[value];
 	                    selectOptions.push('<option value="' + value + '">' + label + '</option>');
 	                }
-	                return '<div class="select"><select>' + selectOptions.join('') + '</select></div>';
+	                return '<div class="' + (isMultiSelect ? 'multiselect' : 'select') + '"><select' + (isMultiSelect ? ' multiple' : '') + '>' + selectOptions.join('') + '</select></div>';
 	            },
 	            toggleSelectOption: function toggleSelectOption(toggleField, selected) {
 	                return '<option value="' + toggleField.id + '" data-type="' + toggleField.type + '"' + (selected ? ' selected' : '') + '>' + toggleField.name + '</option>';

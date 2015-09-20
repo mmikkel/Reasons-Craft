@@ -165,6 +165,7 @@
 	            rule,
 	            $toggleField,
 	            $toggleFieldInput,
+	            toggleFieldData,
 	            toggleFieldValue;
 	
 	        $targetFields.removeClass('reasonsHide').each(function () {
@@ -193,15 +194,36 @@
 	                        continue;
 	                    }
 	
-	                    $toggleFieldInput = $toggleField.find('*:input:first');
-	                    if ($toggleFieldInput.length === 0) {
-	                        continue;
+	                    toggleFieldData = Reasons.getToggleFieldById(rule.fieldId);
+	                    toggleFieldValue = null;
+	
+	                    switch (toggleFieldData.type) {
+	                        case 'Lightswitch':
+	                            $toggleFieldInput = $toggleField.find('*:input:first');
+	                            if ($toggleFieldInput.length > 0) {
+	                                toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
+	                            }
+	                            break;
+	                        case 'Checkboxes':
+	                            $toggleFieldInput = $toggleField.find('input[type="checkbox"]');
+	                            if ($toggleFieldInput.length > 0) {
+	                                toggleFieldValue = $toggleField.find('input:checkbox:checked').map(function () {
+	                                    return $(this).val();
+	                                }).get();
+	                            }
+	                            break;
+	                        default:
+	                            $toggleFieldInput = $toggleField.find('*:input:first');
+	                            toggleFieldValue = $toggleFieldInput.val();
+	                            break;
 	                    }
 	
-	                    toggleFieldValue = $toggleFieldInput.val();
-	
-	                    if ($toggleFieldInput.parent().hasClass('lightswitch')) {
-	                        toggleFieldValue = toggleFieldValue === '1' ? 'true' : 'false';
+	                    // Flatten array values for easier comparisons
+	                    if ($.isArray(toggleFieldValue)) {
+	                        toggleFieldValue = toggleFieldValue.join('');
+	                    }
+	                    if ($.isArray(rule.value)) {
+	                        rule.value = rule.value.join('');
 	                    }
 	
 	                    // Compare trigger field value to expected value
@@ -217,6 +239,9 @@
 	                            }
 	                            break;
 	                    }
+	
+	                    console.log('toggle', toggleFieldValue, 'rule', rule.value, rule.compare);
+	                    console.log('----');
 	
 	                    if (!statementValid) {
 	                        numValidStatements--;
