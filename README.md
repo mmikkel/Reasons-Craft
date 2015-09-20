@@ -1,4 +1,4 @@
-# Reasons 
+# Reasons
 ## v. 0.1.3
 
 _Supercharge your field layouts with conditionals._  
@@ -15,11 +15,14 @@ Reasons makes it possible to add simple conditionals in order to hide or show fi
 
 Sure, I hear ya. When it comes to flexible content, Craft is pretty powerful – and the ability to create separate Entry Types or define a layout with Matrix fields is often the best way to go. Reasons basically offers a third and different option, but I'd recommend to only use it for the fairly simple cases.  
 
-Compared to Entry Types and Matrix, Reasons is _purely_ about increasing usability in the editorial workflow. It works as a thin layer on top of Crafts UI, basically using Javascript to hide and show fields in the entry form as the editor does her magic. Reasons does absolutely nothing to your content, and it doesn't affect the frontend or the way your fields work in any way. In some cases, that's all you need.
+Compared to Entry Types and Matrix, Reasons is _purely_ about increasing usability in the editorial workflow. It works as a thin layer on top of Crafts UI, basically using Javascript to hide and show fields in the entry form as the editor edits her content. _Reasons does absolutely nothing to your data, and it doesn't affect the frontend or the way your fields work in any way_. In some cases, that's all you need.
 
 **What's a toggle field?**
 
-A _toggle field_ in Reasons is a field that can work as a value source for another field's conditionals. The following field types can be used as toggle fields:  
+A _toggle field_ in Reasons is a field that can be used to "toggle" another field on or off (show or hide, as it were). This works by comparing the value of the toggle field (i.e. "1") defined in the Field Layout Designer, to the current value of the same field in the edit entry form.  
+
+The following field types can be used as toggle fields:  
+
 * Lightswitch
 * Dropdown
 * Checkboxes
@@ -55,6 +58,11 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are very welcome!**
 
 ### Changelog
+
+#### 0.2
+
+* Minor refactor to JS
+* Fixes for issues #3 and #5, where Radio Buttons, Checkboxes and Multi-select fields did not work as intended
 
 #### 0.1.3
 
