@@ -204,13 +204,10 @@
 	                                toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
 	                            }
 	                            break;
-	                        case 'Checkboxes':
-	                            $toggleFieldInput = $toggleField.find('input[type="checkbox"]');
-	                            if ($toggleFieldInput.length > 0) {
-	                                toggleFieldValue = $toggleField.find('input:checkbox:checked').map(function () {
-	                                    return $(this).val();
-	                                }).get();
-	                            }
+	                        case 'Checkboxes':case 'RadioButtons':
+	                            toggleFieldValue = $toggleField.find('input:checkbox:checked,input:radio:checked').map(function () {
+	                                return $(this).val();
+	                            }).get();
 	                            break;
 	                        default:
 	                            $toggleFieldInput = $toggleField.find('*:input:first');
