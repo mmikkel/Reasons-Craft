@@ -75,7 +75,22 @@ class ReasonsPlugin extends BasePlugin
     protected function includeResources()
     {
 
-        // TODO Only load necessary resources
+        $isDevMode = craft()->config->get('devMode');
+
+        // Where are we?
+        $path = craft()->request->path;
+        if (preg_match('/^settings\/sections\/[0-9]\/entrytypes\/([0-9]|new)/', $path)) {
+            // Field Layout designer
+            craft()->templates->includeJsResource('reasons/javascripts/FLD.js');
+        }
+        else if (preg_match('/^entries\/.*\/([0-9]|new)/', $path)) {
+            // Edit entry
+            craft()->templates->includeJsResource('reasons/javascripts/EditForm.js');
+        } else {
+            return false;
+        }
+
+        // Reasons data payload
         $data = json_encode(array(
             'conditionals' => craft()->reasons->getAllConditionals(),
             'toggleFields' => craft()->reasons->getToggleFields(),
@@ -83,13 +98,8 @@ class ReasonsPlugin extends BasePlugin
             'fieldIds' => craft()->reasons->getFieldIds(),
             'noToggleFieldsMessage' => Craft::t('No toggle fields available.'),
         ));
-
-        $isDevMode = craft()->config->get('devMode');
-
-        craft()->templates->includeCssResource('reasons/css/' . (!$isDevMode ? 'compressed/' : '') . 'reasons.css');
-        craft()->templates->includeJsResource('reasons/js/' . (!$isDevMode ? 'compressed/' : '') . 'reasons.js');
-
-        craft()->templates->includeJs('(function($){Reasons.settings='.$data.';Reasons.init();})(jQuery);');
+        craft()->templates->includeCssResource('reasons/stylesheets/reasons.css');
+        craft()->templates->includeJs('window._ReasonsData='.$data.';console.log("data set");');
 
     }
 
@@ -100,14 +110,12 @@ class ReasonsPlugin extends BasePlugin
 
     public function onSaveEntryType(Event $e)
     {
-        
+
         $entryType = $e->params['entryType'];
-        
         $conditionalsModel = new Reasons_ConditionalsModel();
         $conditionalsModel->sectionId = $entryType->sectionId;
         $conditionalsModel->typeId = $entryType->id;
         $conditionalsModel->conditionals = craft()->request->getPost('_reasons');;
-
         craft()->reasons->saveConditionals($conditionalsModel);
 
     }
