@@ -14,7 +14,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected   $_version = '0.2',
+    protected   $_version = '0.2.1',
                 $_developer = 'Mats Mikkel Rummelhoff',
                 $_developerUrl = 'http://mmikkel.no',
                 $_pluginName = 'Reasons',
@@ -78,11 +78,11 @@ class ReasonsPlugin extends BasePlugin
         // Include relevant resources based on the request path
         $path = craft()->request->path;
 
-        if (preg_match('/^settings\/sections\/[0-9]\/entrytypes\/([0-9]|new)/', $path))
+        if (preg_match('/^settings\/sections\/.*\/entrytypes\/.*/', $path))
         {
             $target = 'entrytype';
         }
-        else if (preg_match('/^entries\/.*\/([0-9]|new)/', $path))
+        else if (preg_match('/^entries\/.*\/.*/', $path))
         {
             $target = 'entry';
         } else {
