@@ -20,7 +20,7 @@ class ReasonsPlugin extends BasePlugin
                 $_developerUrl = 'http://mmikkel.no',
                 $_pluginName = 'Reasons',
                 $_pluginUrl = 'https://github.com/mmikkel/Reasons-Craft',
-                $_releaseFeedUrl = 'https://github.com/mmikkel/Reasons-Craft/blob/master/releases.json',
+                $_releaseFeedUrl = 'https://raw.githubusercontent.com/mmikkel/Reasons-Craft/master/releases.json',
                 $_minVersion = '2.3';
 
     public function getName()
