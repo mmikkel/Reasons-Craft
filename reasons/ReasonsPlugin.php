@@ -14,11 +14,13 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected   $_version = '0.2.1',
+    protected   $_version = '0.2.2',
+                $_schemaVersion = '1.0',
                 $_developer = 'Mats Mikkel Rummelhoff',
                 $_developerUrl = 'http://mmikkel.no',
                 $_pluginName = 'Reasons',
                 $_pluginUrl = 'https://github.com/mmikkel/Reasons-Craft',
+                $_releaseFeedUrl = 'https://github.com/mmikkel/Reasons-Craft/blob/master/releases.json',
                 $_minVersion = '2.3';
 
     public function getName()
@@ -29,6 +31,11 @@ class ReasonsPlugin extends BasePlugin
     public function getVersion()
     {
         return $this->_version;
+    }
+
+    public function getSchemaVersion()
+    {
+        return $this->_schemaVersion;
     }
 
     public function getDeveloper()
@@ -44,6 +51,11 @@ class ReasonsPlugin extends BasePlugin
     public function getPluginUrl()
     {
         return $this->_pluginUrl;
+    }
+
+    public function getReleaseFeedUrl()
+    {
+        return $this->_releaseFeedUrl;
     }
 
     public function init () {
@@ -80,11 +92,11 @@ class ReasonsPlugin extends BasePlugin
 
         if (preg_match('/^settings\/sections\/.*\/entrytypes\/.*/', $path))
         {
-            $target = 'entrytype';
+            $mode = 'fld';
         }
         else if (preg_match('/^entries\/.*\/.*/', $path))
         {
-            $target = 'entry';
+            $mode = 'edit';
         } else {
             return false;
         }
@@ -93,12 +105,12 @@ class ReasonsPlugin extends BasePlugin
         $manifestPath = dirname(__FILE__) . '/resources/rev-manifest.json';
         $manifest = (file_exists($manifestPath) && $manifest = file_get_contents($manifestPath)) ? json_decode($manifest) : false;
 
-        switch ($target)
+        switch ($mode)
         {
-            case 'entry' :
+            case 'edit' :
                 $url = 'javascripts/EditForm.js';
                 break;
-            case 'entrytype' :
+            case 'fld' :
                 $url = 'javascripts/FLD.js';
                 break;
         }

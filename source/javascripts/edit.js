@@ -3,9 +3,9 @@ var Reasons = require('./reasons');
 Reasons.EditForm = {
 
     settings : {
-        editFormSelector : '#entry-form',
-        fieldsContainerSelector : '#fields',
         fieldsSelector : '.field:not(#title-field)',
+        livePreviewEditorSelector : '.lp-editor',
+        elementEditorSelector : '.elementeditor',
         entryTypeSelectSelector : '#entryType',
         lightswitchContainerSelector : '.lightswitch',
         positionSelectContainerSelector : '.btngroup',
@@ -13,31 +13,40 @@ Reasons.EditForm = {
 
     init : function ()
     {
-        this.$container = $(this.settings.editFormSelector);
-        if (this.$container.length === 0) return false;
-        this.sectionId = parseInt(this.$container.find('input[name="sectionId"]').val());
 
-        if(this.sectionId){
-            this.elementType = 'entries'; // TODO: Will change this when we can haz more element types
+        // Get section ID. This will change in an upcoming release, when we add the remaining built-in element types!
+        this.sectionId = parseInt($('input[type="hidden"][name="sectionId"]').val());
+
+        if (this.sectionId) // We'll assume the user is currently editing an entry
+        {
+            // Init entry type switching
+            this.$entryTypeSelect = $(this.settings.entryTypeSelectSelector);
+            if (this.$entryTypeSelect.length === 0){
+                // Only one entry type ID, get it from Reasons
+                var entryTypeIds = Reasons.getEntryTypeIdsBySectionId(this.sectionId);
+                this.entryTypeId = entryTypeIds && entryTypeIds.length > 0 ? entryTypeIds.shift() : false;
+            } else {
+                // Set entry type ID
+                this.entryTypeId = this.$entryTypeSelect.val();
+            }
+            // Init Live Preview support
+            if (Craft.livePreview)
+            {
+                Craft.livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
+                Craft.livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
+            }
+        }
+        else
+        {
+            return false; // TODO Just for now. We're going to support element editors etc, so this will also change.
         }
 
-        // Get entry type ID
-        this.$entryTypeSelect = $(this.settings.entryTypeSelectSelector);
-        if (this.$entryTypeSelect.length === 0){
-            // Only one entry type ID, get it from Reasons
-            var entryTypeIds = Reasons.getEntryTypeIdsBySectionId(this.sectionId);
-            this.entryTypeId = entryTypeIds && entryTypeIds.length > 0 ? entryTypeIds.shift() : false;
-        } else {
-            // Set entry type ID
-            this.entryTypeId = this.$entryTypeSelect.val();
-        }
-
-        // Listen for AJAX complete, to handle entry type switching
+        // Listen for AJAX complete, to handle entry type switching etc
         this.currentUrl = window.location.href;
         $(document).ajaxComplete($.proxy(this.onAjaxComplete,this));
 
         // Add some event listeners
-        this.$container
+        $(document)
             .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
 
@@ -52,6 +61,20 @@ Reasons.EditForm = {
         }
     },
 
+    getFieldsSelector : function ()
+    {
+        var selectorPath = [this.settings.fieldsSelector];
+        if (this.isLivePreview)
+        {
+            selectorPath.unshift(this.settings.livePreviewEditorSelector);
+        }
+        else if (this.isElementEditor)
+        {
+            selectorPath.unshift(this.settings.elementEditorSelector);
+        }
+        return selectorPath.join(' ');
+    },
+
     initToggleFields : function()
     {
 
@@ -64,12 +87,9 @@ Reasons.EditForm = {
         }
 
         // Get all current fields
-        this.$fieldContainer = $(this.settings.fieldsContainerSelector);
-        this.$fields = this.$fieldContainer.find(this.settings.fieldsSelector);
+        this.$fields = $(this.getFieldsSelector());
 
-        if (this.$fieldContainer.length === 0 || this.$fields.length === 0){
-            return false;
-        }
+        if (this.$fields.length === 0) return false;
 
         // Get toggle field IDs
         var toggleFieldIds = [];
@@ -87,6 +107,7 @@ Reasons.EditForm = {
 
         this.$fields.each(function(){
             $field = $(this);
+            if ($field.attr('id') === undefined) return;
             fieldHandle = $field.attr('id').split('-')[1] || false;
             fieldId = Reasons.getFieldIdByHandle(fieldHandle);
             if (fieldId){
@@ -106,11 +127,11 @@ Reasons.EditForm = {
 
     },
 
-    evaluateConditionals : function(fieldId)
+    evaluateConditionals : function()
     {
 
         var self = this,
-            $targetFields = this.$fieldContainer.find(this.settings.fieldsSelector+'[data-target="1"]'),
+            $targetFields = $(this.getFieldsSelector() + '[data-target="1"]'),
             $targetField,
             statements,
             statementValid,
@@ -144,7 +165,7 @@ Reasons.EditForm = {
 
                         rule = rules[j];
 
-                        $toggleField = self.$fieldContainer.find(self.settings.fieldsSelector+'[data-id="' + rule.fieldId + '"]');
+                        $toggleField = $(self.getFieldsSelector() + '[data-id="' + rule.fieldId + '"]');
                         if ($toggleField.length === 0)
                         {
                             continue;
@@ -214,10 +235,58 @@ Reasons.EditForm = {
 
     onAjaxComplete : function(e, status, requestData)
     {
-        if (requestData.url.indexOf('switchEntryType') === -1) {
+        if (requestData.url.indexOf('switchEntryType') > -1)
+        {
+            this.entryTypeId = this.$entryTypeSelect.val();
+            this.render();
+        }
+        // else if (requestData.url.indexOf('getEditorHtml') > -1)
+        // {
+        //     Garnish.requestAnimationFrame($.proxy(function()
+        //     {
+        //         var $elementEditor = $(this.settings.elementEditorSelector);
+        //         if ($elementEditor.length > 0)
+        //         {
+        //             var $hud = $elementEditor.closest('.hud');
+        //             if ($hud.length > 0 && $hud.data('elementEditor'))
+        //             {
+        //                 var elementEditor = $hud.data('elementEditor');
+        //                 if (elementEditor.hud)
+        //                 {
+        //                     elementEditor.hud.on('hide', $.proxy(this.onElementEditorHide, this));
+        //                 }
+        //                 this.onElementEditorShow();
+        //             }
+        //         }
+        //     }, this));
+        // }
+        else
+        {
             return false;
         }
-        this.entryTypeId = this.$entryTypeSelect.val();
+    },
+
+    onLivePreviewEnter : function ()
+    {
+        this.isLivePreview = true;
+        this.render();
+    },
+
+    onLivePreviewExit : function ()
+    {
+        this.isLivePreview = false;
+        this.render();
+    },
+
+    onElementEditorShow : function ()
+    {
+        this.isElementEditor = true;
+        this.render();
+    },
+
+    onElementEditorHide : function ()
+    {
+        this.isElementEditor = false;
         this.render();
     },
 

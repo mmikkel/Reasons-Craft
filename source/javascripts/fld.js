@@ -15,15 +15,18 @@ Reasons.FLD = {
     init : function ()
     {
 
-        // Get DOM elements
+        // Get FLD
         this.$container = $(this.settings.fieldLayoutFormSelector);
-        if (this.$container.length === 0) return false;
-        this.$form = this.$container.parents(this.settings.formSelector);
-        if (this.$form.length === 0) return false;
+        if (!this.$container || this.$container.length === 0) return false;
+        
+        // Get form
+        this.$form = this.$container.closest(this.settings.formSelector);
+        if (!this.$form || this.$form.length === 0) return false;
 
         // Get database ID and initial conditionals
         var entryTypeId = parseInt(Craft.path.substring(Craft.path.indexOf('entrytypes/')).split('/')[1]) || 'new',
             conditionalsData = Reasons.getConditionalsDataByEntryTypeId(entryTypeId);
+        
         if (conditionalsData)
         {
             this.id = conditionalsData.id;
@@ -60,8 +63,8 @@ Reasons.FLD = {
         // Defer refresh
         setTimeout($.proxy(this.refresh,this),0);
 
-        // Hack time. Make sure stuff is kept up to date when fields move around
         this.$container.on('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
+        $('body').on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
 
     },
 
@@ -146,8 +149,7 @@ Reasons.FLD = {
                         .find('a:first')
                             .data('_reasonsField', $field)
                             .attr('data-action', 'toggle-conditionals')
-                            .text(Craft.t('Manage conditionals'))
-                            .on('click', $.proxy(self.onFieldSettingsMenuItemClick, self));
+                            .text(Craft.t('Manage conditionals'));
 
                     $field.data('_reasonsSettingsMenuItemInitialized',true);
 
@@ -172,7 +174,9 @@ Reasons.FLD = {
             mouseUpHandler = function(e)
             {
                 $('body').off('mouseup', mouseUpHandler);
-                self.refresh();
+                requestAnimationFrame(function () {
+                    self.refresh();
+                });
             };
 
         $('body').on('mouseup', mouseUpHandler);
@@ -181,43 +185,58 @@ Reasons.FLD = {
 
     onFieldSettingsMenuItemClick : function(e) {
 
-        e.preventDefault();
-        e.stopPropagation();
-
         var $trigger = $(e.target),
             $field = $trigger.data('_reasonsField');
 
-        if (!$trigger.data('_reasonsModal')) {
+        if ($trigger.data('action') === 'toggle-conditionals')
+        {
 
-            // Create modal
-            var self = this,
-                builder = $field.data('_reasonsBuilder'),
-                $modal = $(this.templates.modal()),
-                modal = new Garnish.Modal($modal, {
-                    resizable : true,
-                    autoShow : false,
-                    onShow : function()
-                    {
-                        self.refresh();
-                    },
-                    onHide : function()
-                    {
-                        self.refresh();
-                    }
-                });
+            e.preventDefault();
+            e.stopPropagation();
 
-            // Add builder to modal
-            builder.get().appendTo($modal.find('.body'));
+            if (!$trigger.data('_reasonsModal'))
+            {
 
-            $modal.on('click', '.close', function (e) {
-                modal.hide();
-            } );
+                // Create modal
+                var self = this,
+                    builder = $field.data('_reasonsBuilder'),
+                    $modal = $(this.templates.modal()),
+                    modal = new Garnish.Modal($modal, {
+                        resizable : true,
+                        autoShow : false,
+                        onShow : function()
+                        {
+                            requestAnimationFrame(function () {
+                                self.refresh();
+                            });
+                        },
+                        onHide : function()
+                        {
+                            requestAnimationFrame(function () {
+                                self.refresh();
+                            });
+                        }
+                    });
 
-            $trigger.data('_reasonsModal', modal);
+                // Add builder to modal
+                builder.get().appendTo($modal.find('.body'));
+
+                $modal.on('click', '.close', function (e) {
+                    modal.hide();
+                } );
+
+                $trigger.data('_reasonsModal', modal);
+
+            }
+
+            $trigger.data('_reasonsModal').show();
 
         }
 
-        $trigger.data('_reasonsModal').show();
+        var self = this;
+        requestAnimationFrame(function () {
+            self.refresh();
+        });
 
     },
 
