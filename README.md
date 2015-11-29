@@ -2,7 +2,7 @@
 ## v. 0.2.2
 
 _Supercharge your field layouts with conditionals._  
-_New: Craft 2.5 support!  
+_**New: Craft 2.5 support!**_
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
