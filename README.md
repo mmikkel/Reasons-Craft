@@ -78,7 +78,7 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 #### 0.2.2
 
 * Reasons now works in Craft 2.5
-* Reasons now works in Live Preview (Craft 2.5 only)
+* Reasons now works in Live Preview
 * Implemented release feeds (Craft 2.5 only)
 * Updated README and roadmap
 * Fixed an issue where conditionals would not re-render when a toggle field was removed from a tab in the FLD

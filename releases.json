@@ -5,7 +5,7 @@
         "date": "2015-11-29T10:00:00-08:00",
         "notes": [
             "[Added] Reasons now works in Craft 2.5",
-            "[Added] Reasons now works in Live Preview (Craft 2.5 only)",
+            "[Added] Reasons now works in Live Preview",
             "[Added] Implemented release feeds (Craft 2.5 only)",
             "[Improved] Improved the README a little bit",
             "[Fixed] Fixed an issue where conditionals would not re-render when a toggle field was removed from a tab in the FLD.",
