@@ -21,6 +21,7 @@ class ReasonsPlugin extends BasePlugin
                 $_pluginName = 'Reasons',
                 $_pluginUrl = 'https://github.com/mmikkel/Reasons-Craft',
                 $_releaseFeedUrl = 'https://raw.githubusercontent.com/mmikkel/Reasons-Craft/master/releases.json',
+                $_documentationUrl = 'https://github.com/mmikkel/Reasons-Craft/blob/master/README.md',
                 $_minVersion = '2.3';
 
     public function getName()
@@ -56,6 +57,11 @@ class ReasonsPlugin extends BasePlugin
     public function getReleaseFeedUrl()
     {
         return $this->_releaseFeedUrl;
+    }
+
+    public function getDocumentationUrl()
+    {
+        return $this->_documentationUrl;
     }
 
     public function init () {
