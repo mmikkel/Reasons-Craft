@@ -1,4 +1,4 @@
-# Reasons v. 1.0.1 for Craft CMS
+# Reasons v. 1.0.2 for Craft CMS
 
 _Supercharge your field layouts with conditionals._  
 
@@ -7,6 +7,8 @@ Inspired by the Advanced Custom Fields plugin for WordPress, Reasons adds simple
 **New: Reasons now works for _all native element types_ (Entries, Assets, Categories, Tags, Users and Global Sets), in Live Preview and all inline element editor modals!**  
 
 **IMPORTANT: Reasons now requires Craft 2.5+. Have an older version of Reasons installed? _Don't update_ for older Craft versions, and check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
+
+_Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
@@ -85,6 +87,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.2 (01.19.2016)
+
+* [Fixed] Fixed an issue where conditionals would not re-render when the Entry Type was changed inside an element editor modal
 
 #### 1.0.1 (01.18.2016)
 

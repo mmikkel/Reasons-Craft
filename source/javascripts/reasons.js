@@ -43,7 +43,6 @@
         init : function (data)
         {
             this.data = data;
-            console.log(this.data);
             this.initPrimaryForm();
         },
 
@@ -73,7 +72,7 @@
         */
         initElementEditor : function (conditionalsKey)
         {
-            
+
             var conditionals = this.getConditionals(conditionalsKey);
             
             if (!conditionals) {
@@ -120,8 +119,6 @@
 
             var formData = this.getElementSourceFromForm($form),
                 context = formData ? this.getFormContext($form) : false;
-
-            console.log(formData, context);
 
             if (!formData || !context) {
                 return false;

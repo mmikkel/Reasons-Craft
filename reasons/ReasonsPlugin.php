@@ -14,7 +14,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected   $_version = '1.0.1',
+    protected   $_version = '1.0.2',
                 $_schemaVersion = '1.1',
                 $_developer = 'Mats Mikkel Rummelhoff',
                 $_developerUrl = 'http://mmikkel.no',
@@ -169,6 +169,8 @@ class ReasonsPlugin extends BasePlugin
                     case ElementType::Entry :
                         if ($element) {
                             $conditionalsKey = 'entryType:'.$element->type->id;
+                        } else if (isset($attributes['typeId'])) {
+                            $conditionalsKey = 'entryType:'.$attributes['typeId'];
                         } else if (isset($attributes['sectionId'])) {
                             $entryTypes = craft()->sections->getEntryTypesBySectionId((int)$attributes['sectionId']);
                             $entryType = $entryTypes ? array_shift($entryTypes) : false;
