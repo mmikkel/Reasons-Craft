@@ -1,4 +1,4 @@
-# Reasons v. 1.0 for Craft CMS
+# Reasons v. 1.0.1 for Craft CMS
 
 _Supercharge your field layouts with conditionals._  
 
@@ -85,6 +85,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.1 (01.18.2016)
+
+* [Fixed] Fixed an issue where conditionals would not refresh when the Entry Type was changed (thanks to Benjamin Fleming for the quick bug report!)
 
 #### 1.0 (01.18.2016)
 

@@ -1,5 +1,13 @@
 [
     {
+        "version": "1.0.1",
+        "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+        "date": "2016-01-18T10:00:00-08:00",
+        "notes": [
+            "[Fixed] Fixed an issue where conditionals would not refresh when the Entry Type was changed"
+        ]
+    },
+    {
         "version": "1.0",
         "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
         "date": "2016-01-18T10:00:00-08:00",

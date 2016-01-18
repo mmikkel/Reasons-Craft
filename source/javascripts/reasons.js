@@ -43,6 +43,7 @@
         init : function (data)
         {
             this.data = data;
+            console.log(this.data);
             this.initPrimaryForm();
         },
 
@@ -119,6 +120,8 @@
 
             var formData = this.getElementSourceFromForm($form),
                 context = formData ? this.getFormContext($form) : false;
+
+            console.log(formData, context);
 
             if (!formData || !context) {
                 return false;
@@ -226,9 +229,9 @@
                     break;
 
                 case this.ENTRY_ACTION :
-                    var $entryType = $form.find('input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType');
+                    var $entryType = $form.find('select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType');
                     type = $entryType.length ? this.ENTRY_TYPE_HANDLE : this.SECTION_HANDLE;
-                    idInputSelector = $entryType.length ? 'input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType' : 'input[type="hidden"][name="sectionId"], #' + namespace + 'section';
+                    idInputSelector = $entryType.length ? 'select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType' : 'input[type="hidden"][name="sectionId"], #' + namespace + 'section';
                     break;
 
                 case this.ENTRY_TYPE_ACTION : 
