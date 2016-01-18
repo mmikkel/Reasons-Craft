@@ -2,7 +2,7 @@
 
 _Supercharge your field layouts with conditionals._  
 
-**New: Reasons now works for _all native element types_, in Live Preview and all element editor modals**  
+**New: Reasons now works for _all native element types_, in Live Preview and element editor modals!**  
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
@@ -10,7 +10,7 @@ _Supercharge your field layouts with conditionals._
 
 Reasons adds simple conditionals to field layouts, making it possible to hide or display fields on the fly as content is edited. This makes it fun and easy to create flexible, dynamic field layouts in Craft CMS.  
 
-**Reasons is inspired by the conditionals in Advanced Custom Fields (ACF) for WordPress.**  
+Reasons is inspired by the conditionals in Advanced Custom Fields (ACF) for WordPress.  
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
 
