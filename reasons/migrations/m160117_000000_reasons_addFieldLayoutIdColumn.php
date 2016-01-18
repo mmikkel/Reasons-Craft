@@ -24,6 +24,14 @@ class m160117_000000_reasons_addFieldLayoutIdColumn extends BaseMigration
 	public function safeUp()
 	{
 
+		/*
+		*	Craft 2.5+ required – abort migration if not, making it possible to roll back to 2.3 or 2.4
+		*
+		*/
+		if (!version_compare(craft()->getVersion(), '2.5', '>=')) {
+			return false;
+		}
+
 		$table = 'reasons';
 
 		/*
