@@ -88,13 +88,13 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 
 #### 1.0 (01.18.2016)
 
-* [Added] Support for Asset sources",
-* [Added] Support for Category groups",
-* [Added] Support for Tag groups (also works with Tag Manager!)",
-* [Added] Support for Global sets",
-* [Added] Support for Users",
-* [Added] Support element edit modals (all native element types)",
-* [Fixed] Fixed an issue where Redactor II fields would not initialize if they were initially hidden"
+* [Added] Support for Asset sources,
+* [Added] Support for Category groups,
+* [Added] Support for Tag groups (bonus: also works with Tag Manager),
+* [Added] Support for Global sets,
+* [Added] Support for Users,
+* [Added] Support element edit modals (all native element types),
+* [Fixed] Fixed an issue where Redactor II fields would not initialize if they were initially hidden.
 
 #### 0.2.2
 
