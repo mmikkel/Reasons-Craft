@@ -8,7 +8,7 @@ _Supercharge your field layouts with conditionals._
 
 **What does Reasons do?**  
 
-Reasons adds simple conditionals to field layouts, making it possible to hide or display fields on the fly as content is edited. This makes it fun and easy to create flexible, dynamic field layouts in Craft CMS.  
+Reasons adds simple conditionals to field layouts, making it possible to hide or display fields on the fly as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
 
 Reasons is inspired by the conditionals in Advanced Custom Fields (ACF) for WordPress.  
 
@@ -25,6 +25,8 @@ Reasons is inspired by the conditionals in Advanced Custom Fields (ACF) for Word
 ## Usage and common questions
 
 To create or edit conditionals for a certain field, go to the settings for the appropriate element source (i.e. the Entry Type, Category Group, Tag Group, Global Set or Asset source), click the little cogwheel next to the field in the Field Layout Designer and choose "Manage conditionals".  
+
+Note that for element sources that support tabbed field layouts, Reasons is designed to work on a "per-tab" basis.  
 
  **What's a toggle field?**  
 
@@ -59,15 +61,15 @@ _Reasons does absolutely nothing to your content, nor does it affect your fields
 
 First, a bit of history: When P&T opened up their feedback site in March 2015, I submitted a [a feature request for field layout conditionals](http://feedback.buildwithcraft.com/forums/285221-feature-requests/suggestions/7185745-conditionals-in-field-layouts). The request proved quite popular (it has in fact been the number one request since day one), and I decided to build Reasons to prove that this functionality would be both doable and worthwhile to add to Craft core.  
 
-_As Craft doesn't really expose an API for modifying the Control Panel, Reasons is dependant on markup/classnames, Javascript workarounds and undocumented features in order to do its thing._ This means that if P&T ever changes certain aspects of Craft (like they recently did with the CP redesign in Craft 2.5), Reasons is likely to break.  
+As Craft doesn't really expose an API for modifying the Control Panel, Reasons is dependant on markup/classnames, Javascript workarounds and undocumented features in order to do its thing. This means that if P&T ever changes certain aspects of Craft (like they recently did with the CP redesign in Craft 2.5), Reasons is likely to break.  
 
-Also – keeping the popularity of the FR and this plugin in mind – I'm pretty sure Craft will have field layout conditionals in core one day. At that point Reasons would be redundant, and I'll stop working on it.  
+Also, I'm pretty sure Craft will have field layout conditionals in core one day – considering the feature request's popularity – and at that point, Reasons would be made redundant and I would stop working on it.  
 
-However, if Reasons does ever stop working or is made obsolete, it should die gracefully – not taking your content down with it. This is why Reasons will never add attributes to field models, wipe "hidden" fields' content or expose some sort of frontend layer.  
+Considering the above, it's my opinion that _if_ Reasons ever stops working (or is made obsolete), it should die gracefully – not taking your content down with it. This is why Reasons will never add attributes to field models, wipe "hidden" fields' content or expose some sort of frontend layer.  
 
-_My advice is to be smart about how you design your field layouts; always keeping in mind that the layouts may render without conditionals one day._ Use Reasons sparingly – if you find yourself creating a lot of complex conditionals, consider using Entry Types or Matrix fields instead.  
+My advice is to be smart about how you design your field layouts; always keeping in mind that the layouts may render without conditionals one day. Use Reasons sparingly – if you find yourself creating a lot of complex conditionals, consider using Entry Types or Matrix fields instead.  
 
-...and most importantly: [Vote for the feature request!](http://feedback.buildwithcraft.com/forums/285221-feature-requests/suggestions/7185745-conditionals-in-field-layouts)
+...and most importantly: [Vote for the feature request](http://feedback.buildwithcraft.com/forums/285221-feature-requests/suggestions/7185745-conditionals-in-field-layouts)! We'd all love to see field layout conditionals in Craft core.  
 
 ## Roadmap
 
