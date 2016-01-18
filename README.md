@@ -2,15 +2,11 @@
 
 _Supercharge your field layouts with conditionals._  
 
+Inspired by the Advanced Custom Fields plugin for WordPress, Reasons adds simple conditionals to field layouts – making it possible to hide or display fields on the fly, as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
+
 **New: Reasons now works for _all native element types_, in Live Preview and element editor modals!**  
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
-
-**What does Reasons do?**  
-
-Reasons adds simple conditionals to field layouts, making it possible to hide or display fields on the fly as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
-
-Reasons is inspired by the conditionals in Advanced Custom Fields (ACF) for WordPress.  
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
 
@@ -28,7 +24,7 @@ To create or edit conditionals for a certain field, go to the settings for the a
 
 Note that for element sources that support tabbed field layouts, Reasons is designed to work on a "per-tab" basis.  
 
- **What's a toggle field?**  
+### What's a toggle field?
 
 A _toggle field_ in Reasons is a field that can be used to "toggle" another field (the _target field_) on or off (show or hide, as it were). This works by comparing the value of the toggle field declared inside the Field Layout Designer, to the current value of that same field when the content is edited.  
 
@@ -45,15 +41,15 @@ The following FieldTypes can be used as toggle fields:
 
 All FieldTypes (even custom ones) can be target fields.  
 
-**Does Reasons work inside Matrix fields?**
+### Does Reasons work inside Matrix fields?
 
 Nope, not yet. Work is underway for Matrix block type support, but it's pretty difficult and there's no ETA, unfortunately.
 
-**A note on required fields**
+### A note on required fields
 
 Be careful not to add conditionals to a _required_ field – **even if a required field is hidden, it'll still be required** by Craft; making your content impossible to save. I might add functionality to Reasons making it impossible to add conditionals to a required field, or possibly look at ways to override/avoid the `required` property if a field is hidden – but no promises :)
 
-**What Reasons doesn't do – or _a disclaimer of sorts_**  
+### What Reasons _doesn't_ do – or a disclaimer of sorts
 
 It's important to realize that Reasons is _strictly about increasing editorial workflow usability_. It works as a thin layer on top of Craft's CP UI, using JavaScript to show and hide fields as content is edited.  
 
