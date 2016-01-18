@@ -1,99 +1,98 @@
-var Reasons = require('./reasons');
+module.exports = class {
 
-Reasons.EditForm = {
-
-    settings : {
-        fieldsSelector : '.field:not(#title-field)',
-        livePreviewEditorSelector : '.lp-editor',
-        elementEditorSelector : '.elementeditor',
-        entryTypeSelectSelector : '#entryType',
-        lightswitchContainerSelector : '.lightswitch',
-        positionSelectContainerSelector : '.btngroup',
-    },
-
-    init : function ()
+    constructor ($el, conditionals)
     {
 
-        // Get section ID. This will change in an upcoming release, when we add the remaining built-in element types!
-        this.sectionId = parseInt($('input[type="hidden"][name="sectionId"]').val());
+        this.settings = {
+            fieldsSelector : '.field:not(#title-field)',
+            livePreviewEditorSelector : '.lp-editor',
+            elementEditorSelector : '.elementeditor',
+            lightswitchContainerSelector : '.lightswitch',
+            positionSelectContainerSelector : '.btngroup'
+        };
 
-        if (this.sectionId) // We'll assume the user is currently editing an entry
-        {
-            // Init entry type switching
-            this.$entryTypeSelect = $(this.settings.entryTypeSelectSelector);
-            if (this.$entryTypeSelect.length === 0){
-                // Only one entry type ID, get it from Reasons
-                var entryTypeIds = Reasons.getEntryTypeIdsBySectionId(this.sectionId);
-                this.entryTypeId = entryTypeIds && entryTypeIds.length > 0 ? entryTypeIds.shift() : false;
-            } else {
-                // Set entry type ID
-                this.entryTypeId = this.$entryTypeSelect.val();
-            }
-            // Init Live Preview support
-            if (Craft.livePreview)
-            {
-                Craft.livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
-                Craft.livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
-            }
-        }
-        else
-        {
-            return false; // TODO Just for now. We're going to support element editors etc, so this will also change.
+        this.$el = $el;
+        this.id = this.$el.attr('id');
+
+        if (!this.id) {
+            this.id = '_reasonsForm-' + Math.random().toString(36).slice(2);
+            this.$el.attr('id', this.id);
         }
 
-        // Listen for AJAX complete, to handle entry type switching etc
-        this.currentUrl = window.location.href;
-        $(document).ajaxComplete($.proxy(this.onAjaxComplete,this));
+        this.conditionals = conditionals;
 
-        // Add some event listeners
-        $(document)
+        this.addEventListeners();
+        this.render();
+
+        return this;
+
+    }
+
+    addEventListeners()
+    {
+        
+        Garnish.$doc
             .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
 
-        this.render();
+        if (Craft.livePreview) {
+            Craft.livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
+            Craft.livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
+        }
 
-    },
+    }
 
-    render : function()
+    removeEventListeners()
+    {
+        
+        Garnish.$doc
+            .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
+            .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
+        
+        if (Craft.livePreview) {
+            Craft.livePreview.off('enter', $.proxy(this.onLivePreviewEnter, this));
+            Craft.livePreview.off('exit', $.proxy(this.onLivePreviewExit, this));
+        }
+
+    }
+
+    destroy()
+    {
+        this.removeEventListeners();
+    }
+
+    render()
     {
         if(this.initToggleFields()){
             this.evaluateConditionals();
         }
-    },
+    }
 
-    getFieldsSelector : function ()
+    getFieldsSelector()
     {
         var selectorPath = [this.settings.fieldsSelector];
         if (this.isLivePreview)
         {
             selectorPath.unshift(this.settings.livePreviewEditorSelector);
-        }
-        else if (this.isElementEditor)
-        {
-            selectorPath.unshift(this.settings.elementEditorSelector);
+        } else {
+            selectorPath.unshift('#' + this.id);
         }
         return selectorPath.join(' ');
-    },
+    }
 
-    initToggleFields : function()
+    initToggleFields()
     {
-
-        var conditionalsData = Reasons.getConditionalsDataByEntryTypeId(this.entryTypeId);
-
-        if (conditionalsData && conditionalsData.sectionId == this.sectionId && conditionalsData.typeId == this.entryTypeId && conditionalsData.conditionals) {
-            this.conditionals = conditionalsData.conditionals;
-        } else {
-            return false;
-        }
 
         // Get all current fields
         this.$fields = $(this.getFieldsSelector());
 
-        if (this.$fields.length === 0) return false;
+        if (this.$fields.length === 0) {
+            return false;
+        }
 
         // Get toggle field IDs
         var toggleFieldIds = [];
-        for (fieldId in this.conditionals){
+        for (fieldId in this.conditionals) {
             for (var i = 0; i < this.conditionals[fieldId].length; ++i){
                 toggleFieldIds.push(this.conditionals[fieldId][i][0].fieldId);
             }
@@ -105,11 +104,11 @@ Reasons.EditForm = {
             fieldHandle,
             fieldId;
 
-        this.$fields.each(function(){
+        this.$fields.each(function () {
             $field = $(this);
             if ($field.attr('id') === undefined) return;
-            fieldHandle = $field.attr('id').split('-')[1] || false;
-            fieldId = Reasons.getFieldIdByHandle(fieldHandle);
+            fieldHandle = $field.attr('id').split('-').slice(-2, -1)[0] || false;
+            fieldId = Craft.ReasonsPlugin.getFieldIdByHandle(fieldHandle);
             if (fieldId){
                 $field.attr('data-id',fieldId);
             }
@@ -125,9 +124,9 @@ Reasons.EditForm = {
 
         return true;
 
-    },
+    }
 
-    evaluateConditionals : function()
+    evaluateConditionals()
     {
 
         var self = this,
@@ -171,7 +170,7 @@ Reasons.EditForm = {
                             continue;
                         }
 
-                        toggleFieldData = Reasons.getToggleFieldById(rule.fieldId);
+                        toggleFieldData = Craft.ReasonsPlugin.getToggleFieldById(rule.fieldId);
                         toggleFieldValue = null;
 
                         switch (toggleFieldData.type)
@@ -231,75 +230,36 @@ Reasons.EditForm = {
                 }
 
         });
-    },
+    }
 
-    onAjaxComplete : function(e, status, requestData)
-    {
-        if (requestData.url.indexOf('switchEntryType') > -1)
-        {
-            this.entryTypeId = this.$entryTypeSelect.val();
-            this.render();
-        }
-        // else if (requestData.url.indexOf('getEditorHtml') > -1)
-        // {
-        //     Garnish.requestAnimationFrame($.proxy(function()
-        //     {
-        //         var $elementEditor = $(this.settings.elementEditorSelector);
-        //         if ($elementEditor.length > 0)
-        //         {
-        //             var $hud = $elementEditor.closest('.hud');
-        //             if ($hud.length > 0 && $hud.data('elementEditor'))
-        //             {
-        //                 var elementEditor = $hud.data('elementEditor');
-        //                 if (elementEditor.hud)
-        //                 {
-        //                     elementEditor.hud.on('hide', $.proxy(this.onElementEditorHide, this));
-        //                 }
-        //                 this.onElementEditorShow();
-        //             }
-        //         }
-        //     }, this));
-        // }
-        else
-        {
-            return false;
-        }
-    },
-
-    onLivePreviewEnter : function ()
+    /*
+    *   Live preview
+    *
+    */
+    onLivePreviewEnter ()
     {
         this.isLivePreview = true;
         this.render();
-    },
+    }
 
-    onLivePreviewExit : function ()
+    onLivePreviewExit ()
     {
         this.isLivePreview = false;
         this.render();
-    },
+    }
 
-    onElementEditorShow : function ()
-    {
-        this.isElementEditor = true;
-        this.render();
-    },
-
-    onElementEditorHide : function ()
-    {
-        this.isElementEditor = false;
-        this.render();
-    },
-
-    onInputWrapperClick : function(e)
+    /*
+    *   Event handlers
+    *
+    */
+    onInputWrapperClick (e)
     {
         $(e.currentTarget).find('input:first').trigger('change');
-    },
+    }
 
-    onFieldInputChange : function(e)
+    onFieldInputChange (e)
     {
         this.evaluateConditionals();
     }
 
-};
-
-if (window.$) $(function(){ Reasons.EditForm.init(); });
+}

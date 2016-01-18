@@ -13,9 +13,9 @@ module.exports = {
       dest: 'javascripts',
       extractSharedJs: false,
       entries: {
-        FLD : ['./fld.js'],
-        EditForm : ['./edit.js'],
-        //page: ['./page.js']
+        // FLD : ['./fld.js'],
+        // EditForm : ['./edit.js'],
+        reasons: ['./reasons.js']
       },
       extensions: ['js']
     },

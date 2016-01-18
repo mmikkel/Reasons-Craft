@@ -8,7 +8,7 @@
  * @since       Craft 2.3
  * @copyright   Copyright (c) 2015, Mats Mikkel Rummelhoff
  * @license     http://opensource.org/licenses/mit-license.php MIT License
- * @link        https://github.com/mmikkel/dashcols-craft
+ * @link        https://github.com/mmikkel/Reasons-Craft
  */
 
 class Reasons_ConditionalsModel extends BaseModel
@@ -22,8 +22,7 @@ class Reasons_ConditionalsModel extends BaseModel
 	{
 		return array(
 			'id' => AttributeType::Number,
-			'sectionId' => AttributeType::Number,
-			'typeId' => AttributeType::Number,
+			'fieldLayoutId' => AttributeType::Number,
 			'conditionals' => AttributeType::Mixed,
 		);
 	}

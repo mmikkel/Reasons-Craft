@@ -1,13 +1,11 @@
-var Reasons = require('../reasons');
-
-module.exports = Garnish.Base.extend({
+var ConditionalsBuilder = Garnish.Base.extend({
 
     $container : null,
 
     init: function(settings)
     {
 
-        this.setSettings(settings, Reasons.Builder.defaults);
+        this.setSettings(settings, ConditionalsBuilder.defaults);
 
         this.templates = this.settings.templates;
         this.fieldId = this.settings.fieldId;
@@ -51,7 +49,7 @@ module.exports = Garnish.Base.extend({
 
         this.refresh();
 
-        Reasons.Builder.instances.push(this);
+        ConditionalsBuilder.instances.push(this);
 
     },
 
@@ -86,6 +84,10 @@ module.exports = Garnish.Base.extend({
 
     setToggleFields : function (toggleFields)
     {
+
+        if (!toggleFields) {
+            return false;
+        }
 
         this.settings.toggleFields = [];
         this.settings.toggleFieldIds = [];
@@ -131,8 +133,7 @@ module.exports = Garnish.Base.extend({
             $rule,
             $toggleSelect,
             toggleSelectValue,
-            toggleSelectOpts,
-            toggleFieldId;
+            toggleSelectOpts;
 
         $statements.each(function () {
 
@@ -232,31 +233,12 @@ module.exports = Garnish.Base.extend({
             $target = settings.target || this.$builder.find('.reasonsStatement:last'),
             fieldId = settings.fieldId,
             compare = settings.compare,
-            value = settings.value,
-            toggleField;
+            value = settings.value;
 
         // Build the rule
         if (fieldId) {
             $rule.find('.reasonsRuleToggleField select').val(fieldId);
         }
-
-        // Validate selected value TODO: Buggy/incomplete
-        // if(fieldId !== null){
-        //     toggleField = Reasons.getToggleFieldById(fieldId);
-        //     if (!toggleField){
-        //         return false;
-        //     }
-        //     if(value !== null && toggleField.settings.options){
-        //         var possibleValues = [];
-        //         for (var i = 0; i < toggleField.settings.options.length; ++i){
-        //             possibleValues.push(toggleField.settings.options[i].value);
-        //         }
-        //         console.log('*****',possibleValues);
-        //         if(possibleValues.indexOf(value) === -1){
-        //             return false;
-        //         }
-        //     }
-        // }
 
         // Append the rule
         if ($target.length > 0) {
@@ -313,7 +295,7 @@ module.exports = Garnish.Base.extend({
             $rule = $target.parents('.reasonsRule'),
             $ruleValue = $rule.find('.reasonsRuleValue'),
             toggleFieldId = $target.val(),
-            toggleField = Reasons.getToggleFieldById(toggleFieldId),
+            toggleField = Craft.ReasonsPlugin.getToggleFieldById(toggleFieldId),
             toggleFieldType = toggleField.type,
             toggleFieldSettings = toggleField.settings,
             ruleValueContent = '';
@@ -470,3 +452,5 @@ module.exports = Garnish.Base.extend({
     },
     instances: []
 });
+
+module.exports = ConditionalsBuilder;

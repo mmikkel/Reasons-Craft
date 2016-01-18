@@ -1,45 +1,48 @@
-var Reasons = require('./reasons');
+var Reasons_ConditionalsBuilder = require('./builder');
 
-Reasons.Builder = require('./modules/builder');
+module.exports = class {
 
-Reasons.FLD = {
-
-    settings : {
-        fieldLayoutFormSelector : '#fieldlayoutform',
-        formSelector : 'form:first',
-        fieldSettingsSelector : 'a.settings',
-        fieldSelector : '.fld-field',
-        tabSelector : '.fld-tabs .fld-tab'
-    },
-
-    init : function ()
+    constructor ($el, conditionals)
     {
+        
+        this.$el = $el;
+        this.conditionals = conditionals;
+        
+        this.settings = {
+            formSelector : 'form:first',
+            fieldSettingsSelector : 'a.settings',
+            fieldSelector : '.fld-field',
+            tabSelector : '.fld-tabs .fld-tab'
+        };
 
-        // Get FLD
-        this.$container = $(this.settings.fieldLayoutFormSelector);
-        if (!this.$container || this.$container.length === 0) return false;
+        this.templates = {
+            input : function(settings)
+            {
+                return '<input type="' + settings.type + '" name="' + (settings.name || '') + '" value="' + (settings.value || '') + '" />';
+            },
+            modal : function()
+            {
+                return '<div class="modal elementselectormodal reasonsModal"><div class="body" /><div class="footer"><div class="buttons rightalign first"><div class="btn close submit">Done</div></div></div></div>';
+            }
+        };
+
+        this.init();
+
+    }
+
+    init ()
+    {
         
         // Get form
-        this.$form = this.$container.closest(this.settings.formSelector);
+        this.$form = this.$el.closest(this.settings.formSelector);
         if (!this.$form || this.$form.length === 0) return false;
 
-        // Get database ID and initial conditionals
-        var entryTypeId = parseInt(Craft.path.substring(Craft.path.indexOf('entrytypes/')).split('/')[1]) || 'new',
-            conditionalsData = Reasons.getConditionalsDataByEntryTypeId(entryTypeId);
-        
-        if (conditionalsData)
-        {
-            this.id = conditionalsData.id;
-            this.conditionals = conditionalsData.conditionals;
-        }
-
         // Get available toggle field IDs
-        var self = this;
-        this.toggleFieldIds = [];
-        $.map(Reasons.getToggleFields(), function(toggleField){
-            self.toggleFieldIds.push(parseInt(toggleField.id));
+        var toggleFields = Craft.ReasonsPlugin.getToggleFields();
+        this.toggleFieldIds = $.map(toggleFields, function(toggleField){
+            return parseInt(toggleField.id);
         });
-
+        
         // This hidden input will store our serialized conditionals
         this.$conditionalsInput = $(this.templates.input({
             name : '_reasons',
@@ -60,17 +63,24 @@ Reasons.FLD = {
             // Attach submit event listener
             .on('submit', $.proxy(this.onFormSubmit, this));
 
-        // Defer refresh
-        setTimeout($.proxy(this.refresh,this),0);
+        // Defer refresh to RAF
+        Garnish.requestAnimationFrame($.proxy(function () {
+            this.refresh();
+        }, this));
 
-        this.$container.on('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
-        $('body').on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
+        this.$el.on('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
+        Garnish.$doc.on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
 
-    },
+    }
 
-    refresh : function()
+    destroy ()
     {
+        this.$el.off('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
+        Garnish.$doc.on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
+    }
 
+    refresh ()
+    {
         var self = this,
             conditionals = {},
             $fields,
@@ -79,7 +89,7 @@ Reasons.FLD = {
             toggleFields;
 
         // Loop over tabs
-        this.$container.find(this.settings.tabSelector).each(function(){
+        this.$el.find(this.settings.tabSelector).each(function(){
 
             // Get all fields for this tab
             $fields = $(this).find(self.settings.fieldSelector);
@@ -90,7 +100,7 @@ Reasons.FLD = {
                 $field = $(this);
                 fieldId = parseInt($field.data('id'));
                 if (self.toggleFieldIds.indexOf(fieldId) > -1){
-                    var toggleField = Reasons.getToggleFieldById(fieldId);
+                    var toggleField = Craft.ReasonsPlugin.getToggleFieldById(fieldId);
                     if (toggleField){
                         toggleFields.push(toggleField);
                     }
@@ -106,7 +116,7 @@ Reasons.FLD = {
                 if (!$field.data('_reasonsBuilder')){
 
                     // Create builder
-                    $field.data('_reasonsBuilder',new Reasons.Builder({
+                    $field.data('_reasonsBuilder', new Reasons_ConditionalsBuilder({
                         fieldId : fieldId,
                         toggleFields : toggleFields,
                         rules : self.conditionals && self.conditionals.hasOwnProperty(fieldId) ? self.conditionals[fieldId] : null
@@ -145,7 +155,7 @@ Reasons.FLD = {
                         .find('ul')
                         .children(':first')
                         .clone(true)
-                        .prependTo($menu.find('ul:first'))
+                        .appendTo($menu.find('ul:first'))
                         .find('a:first')
                             .data('_reasonsField', $field)
                             .attr('data-action', 'toggle-conditionals')
@@ -160,30 +170,32 @@ Reasons.FLD = {
         });
 
         if (Object.keys(conditionals).length === 0){
-            this.$conditionalsInput.attr('value','');
+            this.$conditionalsInput.attr('value', '');
         } else {
-            this.$conditionalsInput.attr('value',JSON.stringify(conditionals));
+            this.$conditionalsInput.attr('value', JSON.stringify(conditionals));
         }
+    }
 
-    },
-
-    onFieldMouseDown : function ( e )
+    /*
+    *   Event handlers
+    *
+    */
+    onFieldMouseDown (e)
     {
-
         var self = this,
             mouseUpHandler = function(e)
             {
                 $('body').off('mouseup', mouseUpHandler);
-                requestAnimationFrame(function () {
+                Garnish.requestAnimationFrame(function () {
                     self.refresh();
                 });
             };
 
         $('body').on('mouseup', mouseUpHandler);
+    }
 
-    },
-
-    onFieldSettingsMenuItemClick : function(e) {
+    onFieldSettingsMenuItemClick (e)
+    {
 
         var $trigger = $(e.target),
             $field = $trigger.data('_reasonsField');
@@ -206,13 +218,13 @@ Reasons.FLD = {
                         autoShow : false,
                         onShow : function()
                         {
-                            requestAnimationFrame(function () {
+                            Garnish.requestAnimationFrame(function () {
                                 self.refresh();
                             });
                         },
                         onHide : function()
                         {
-                            requestAnimationFrame(function () {
+                            Garnish.requestAnimationFrame(function () {
                                 self.refresh();
                             });
                         }
@@ -233,29 +245,15 @@ Reasons.FLD = {
 
         }
 
-        var self = this;
-        requestAnimationFrame(function () {
-            self.refresh();
-        });
+        Garnish.requestAnimationFrame($.proxy(function () {
+            this.refresh();
+        }, this));
 
-    },
-
-    onFormSubmit : function()
-    {
-        this.refresh();
-    },
-
-    templates : {
-        input : function(settings)
-        {
-            return '<input type="' + settings.type + '" name="' + (settings.name || '') + '" value="' + (settings.value || '') + '" />';
-        },
-        modal : function()
-        {
-            return '<div class="modal elementselectormodal reasonsModal"><div class="body" /><div class="footer"><div class="buttons rightalign first"><div class="btn close submit">Done</div></div></div></div>';
-        }
     }
 
-};
+    onFormSubmit ()
+    {
+        this.refresh();
+    }
 
-if (window.$) $(function(){ Reasons.FLD.init(); });
+}

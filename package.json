@@ -19,18 +19,7 @@
     "test": "gulp build:production && karma start --single-run"
   },
   "dependencies": {
-    "bourbon": "^4.2.4",
-    "breakpoint-sass": "^2.6.1",
-    "crossroads": "^0.12.2",
-    "fastclick": "^1.0.6",
-    "gsap": "^1.18.0",
-    "imagesloaded": "^3.1.8",
-    "normalize-css": "^2.3.1",
-    "object-fit": "^0.4.3",
-    "signals": "^1.0.0",
-    "susy": "^2.2.6",
-    "underscore": "^1.8.3",
-    "verge": "^1.9.1"
+    "urijs": "^1.17.0"
   },
   "devDependencies": {
     "babel-core": "^5.8.3",

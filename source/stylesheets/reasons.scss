@@ -1,5 +1,11 @@
 .field.reasonsHide {
-	display: none;
+	height: 0 !important;
+    visibility: hidden !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    margin: 0 !important; padding: 0 !important;
+    position: absolute !important;
+    // top: -100% !important; left: -100% !important;
 }
 
 .reasonsModal .body {
@@ -110,4 +116,19 @@
 
 .fld-field.reasonsHasConditionals {
     border-style: dashed;
+}
+
+/*
+*   Matrix
+*
+*/
+.matrix-configurator {
+
+    .reasonsAdd {
+        display: inline-block;
+        float: none;
+        width: auto;
+        margin-right: 10px;
+    }
+
 }

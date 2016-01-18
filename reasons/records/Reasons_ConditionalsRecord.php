@@ -8,7 +8,7 @@
  * @since       Craft 2.3
  * @copyright   Copyright (c) 2015, Mats Mikkel Rummelhoff
  * @license     http://opensource.org/licenses/mit-license.php MIT License
- * @link        https://github.com/mmikkel/dashcols-craft
+ * @link        https://github.com/mmikkel/Reasons-Craft
  */
 
 class Reasons_ConditionalsRecord extends BaseRecord
@@ -25,8 +25,7 @@ class Reasons_ConditionalsRecord extends BaseRecord
 	protected function defineAttributes()
 	{
 		return array(
-			'sectionId' => AttributeType::Number,
-			'typeId' => AttributeType::Number,
+			'fieldLayoutId' => AttributeType::Number,
 			'conditionals' => AttributeType::Mixed,
 		);
 	}
@@ -38,16 +37,10 @@ class Reasons_ConditionalsRecord extends BaseRecord
 	public function defineRelations()
 	{
 		return array(
-			'section' => array(
+			'fieldLayout' => array(
 				static::BELONGS_TO,
-				'SectionRecord',
-				'sectionId',
-				'onDelete' => static::CASCADE,
-			),
-			'entryType' => array(
-				static::BELONGS_TO,
-				'EntryTypeRecord',
-				'typeId',
+				'FieldLayoutRecord',
+				'fieldLayoutId',
 				'onDelete' => static::CASCADE,
 			),
 		);
