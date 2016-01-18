@@ -12,11 +12,11 @@ Inspired by the Advanced Custom Fields plugin for WordPress, Reasons adds simple
 
 ## Installation
 
-**Important: Reasons requires Craft 2.5+.** Need Craft 2.4 or 2.3 support? Check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).  
-
 * Download and unzip
 * Move the `/reasons` folder to your `/craft/plugins` folder
 * Install from the Control Panel (`/admin/settings/plugins`)
+
+**Important: Reasons requires Craft 2.5+.** Need Craft 2.4 or 2.3 support? Check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).  
 
 ## Usage and common questions
 
