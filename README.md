@@ -2,7 +2,10 @@
 ## v. 0.2.2
 
 _Supercharge your field layouts with conditionals._  
-_**New: Craft 2.5 support!**_
+
+**NOTE: This is the legacy branch for Reasons. This version supports Craft 2.3 through 2.5, but is behind the current version's featureset and will not receive further updates.**  
+
+For the current version, which supports Craft 2.5 only, please see the [master branch](https://github.com/mmikkel/Reasons-Craft).
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
