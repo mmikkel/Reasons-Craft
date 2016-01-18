@@ -29,6 +29,7 @@ class m160117_000000_reasons_addFieldLayoutIdColumn extends BaseMigration
 		*
 		*/
 		if (!version_compare(craft()->getVersion(), '2.5', '>=')) {
+			throw new Exception(Craft::t('Reasons 1.0 requires Craft 2.5 or newer and is unable to complete this update. Please restore Reasons to v. 0.2.2 or older, or update your Craft install.'));
 			return false;
 		}
 
