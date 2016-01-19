@@ -6,7 +6,7 @@ Inspired by the Advanced Custom Fields plugin for WordPress, Reasons adds simple
 
 **New: Reasons now works for _all native element types_ (Entries, Assets, Categories, Tags, Users and Global Sets), in Live Preview and all inline element editor modals!**  
 
-**IMPORTANT: Reasons now requires Craft 2.5+. Have an older version of Reasons installed? _Don't update_ for older Craft versions, and check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
+**IMPORTANT: Reasons now requires Craft 2.5 or newer! If you're running Craft 2.4 or below, don't attempt to update to or install Reasons 1.x. An older version of Reasons supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
 
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_
 
