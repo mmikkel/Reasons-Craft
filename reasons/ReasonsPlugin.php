@@ -115,11 +115,9 @@ class ReasonsPlugin extends BasePlugin
 
             $this->includeResources();
         
-            craft()->templates->includeJs('$(function(){
-                if (Craft.ReasonsPlugin) {
-                    Craft.ReasonsPlugin.init('.$this->getData().');
-                }
-            });');
+            craft()->templates->includeJs('if (window.Craft && window.Craft.ReasonsPlugin) {
+                Craft.ReasonsPlugin.init('.$this->getData().');
+            }');
             
             craft()->on('fields.saveFieldLayout', array($this,'onSaveFieldLayout'));
 
@@ -147,11 +145,7 @@ class ReasonsPlugin extends BasePlugin
 
             case 'switchEntryType' :
                 
-                craft()->templates->includeJs('$(function(){
-                    if (Craft.ReasonsPlugin) {
-                        Craft.ReasonsPlugin.initPrimaryForm();
-                    }
-                });');
+                craft()->templates->includeJs('Craft.ReasonsPlugin.initPrimaryForm();');
 
                 break;
 
@@ -201,11 +195,7 @@ class ReasonsPlugin extends BasePlugin
                 }     
 
                 if ($conditionalsKey) {
-                    craft()->templates->includeJs('$(function(){
-                        if (Craft.ReasonsPlugin) {
-                            Craft.ReasonsPlugin.initElementEditor("'.$conditionalsKey.'");
-                        }
-                    });');
+                    craft()->templates->includeJs('Craft.ReasonsPlugin.initElementEditor("'.$conditionalsKey.'");');
                 }
 
                 break;
