@@ -9,7 +9,8 @@ Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditiona
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
 ## Recent updates
-* Support for all native element types (Entries, Assets, Categories, Tags and Global Sets)
+* Support for all native element types (Entries, Assets, Categories, Tags, Users and Global Sets)
+* Support for [Tag Manager](https://github.com/boboldehampsink/tagmanager)
 * Support for all native element editor modals
 * Support for Live Preview
 
