@@ -1,18 +1,21 @@
-# Reasons v. 1.0.2 for Craft CMS
+# Reasons v. 1.0.2 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
-Inspired by the Advanced Custom Fields plugin for WordPress, Reasons adds simple conditionals to field layouts – making it possible to hide or display fields on the fly, as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
-
-**New: Reasons now works for _all native element types_ (Entries, Assets, Categories, Tags, Users and Global Sets), in Live Preview and all inline element editor modals!**  
-
-**IMPORTANT: Reasons now requires Craft 2.5 or newer! If you're running Craft 2.4 or below, don't attempt to update to or install Reasons 1.x. An older version of Reasons supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
-
-_Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_
-
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
-![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
+Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditionals to field layouts – making it possible to hide or display fields on the fly, as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
+
+_Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
+
+## Recent updates
+* Support for all native element types (Entries, Assets, Categories, Tags and Global Sets)
+* Support for all native element editor modals
+* Support for Live Preview
+
+## Requirements
+
+**Reasons now requires Craft 2.5 or newer. Running Craft 2.4 or below? Don't attempt to install or update to Reasons 1.x – an older version supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
 
 ## Installation
 
@@ -23,6 +26,8 @@ _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good id
 **Important: Reasons requires Craft 2.5+.** Need Craft 2.4 or 2.3 support? Check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).  
 
 ## Usage and common questions
+
+![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
 
 To create or edit conditionals for a certain field, go to the settings for the appropriate element source (i.e. the Entry Type, Category Group, Tag Group, Global Set or Asset source), click the little cogwheel next to the field in the Field Layout Designer and choose "Manage conditionals".  
 
@@ -73,7 +78,7 @@ My advice is to be smart about how you design your field layouts; always keeping
 
 ## Roadmap
 
-* Support for Matrix fields
+* Support for Matrix fields (in progress)
 * Support for Super Table fields
 * Better handling of required fields
 * Add support for the Button Box custom FieldType
