@@ -22,6 +22,8 @@ module.exports = class {
         this.conditionals = conditionals;
 
         this.addEventListeners();
+        this.addLivePreviewListeners();
+        
         this.render();
 
         return this;
@@ -30,35 +32,63 @@ module.exports = class {
 
     addEventListeners()
     {
-        
         Garnish.$doc
             .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
-
-        if (Craft.livePreview) {
-            Craft.livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
-            Craft.livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
-        }
-
     }
 
     removeEventListeners()
     {
-        
         Garnish.$doc
             .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
             .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
-        
-        if (Craft.livePreview) {
-            Craft.livePreview.off('enter', $.proxy(this.onLivePreviewEnter, this));
-            Craft.livePreview.off('exit', $.proxy(this.onLivePreviewExit, this));
+    }
+
+    addLivePreviewListeners()
+    {
+
+        function getLivePreviewInstance()
+        {
+            if (Craft.livePreview) {
+            
+                this._livePreview = Craft.livePreview;
+                this._livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
+                this._livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
+                
+                if (this._livePreviewPollId) delete this._livePreviewPollId;
+            
+            } else if (new Date().getTime() - now < 2000) {
+                
+                this._livePreviewPollId = Garnish.requestAnimationFrame(livePreviewPoller);
+
+            }
         }
 
+        var livePreviewPoller = getLivePreviewInstance.bind(this),
+            livePreview,
+            now = new Date().getTime();
+
+        livePreviewPoller();
+
+    }
+
+    removeLivePreviewListeners()
+    {
+        if (this._livePreviewPollId) {
+            Garnish.cancelAnimationFrame(this._livePreviewPollId);
+            delete this._livePreviewPollId;
+        }
+        if (this._livePreview) {
+            this._livePreview.off('enter', $.proxy(this.onLivePreviewEnter, this));
+            this._livePreview.off('exit', $.proxy(this.onLivePreviewExit, this));
+            delete this._livePreview;
+        }
     }
 
     destroy()
     {
         this.removeEventListeners();
+        this.removeLivePreviewListeners();
     }
 
     render()
@@ -238,12 +268,14 @@ module.exports = class {
     */
     onLivePreviewEnter ()
     {
+        console.log('entered live preview');
         this.isLivePreview = true;
         this.render();
     }
 
     onLivePreviewExit ()
     {
+        console.log('exited live preview');
         this.isLivePreview = false;
         this.render();
     }

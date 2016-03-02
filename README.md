@@ -1,4 +1,4 @@
-# Reasons v. 1.0.2 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.3 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -93,6 +93,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.3 (03.02.2016)
+
+* [Fixed] Fixed an issue where conditionals would not work in Live Preview
 
 #### 1.0.2 (01.19.2016)
 

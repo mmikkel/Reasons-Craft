@@ -1,5 +1,13 @@
 [
     {
+        "version": "1.0.3",
+        "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+        "date": "2016-03-02T10:00:00-08:00",
+        "notes": [
+            "[Fixed] Fixed an issue where conditionals would not work in Live Preview"
+        ]
+    },
+    {
         "version": "1.0.2",
         "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
         "date": "2016-01-19T10:00:00-08:00",
