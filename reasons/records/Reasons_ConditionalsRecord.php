@@ -11,39 +11,46 @@
  * @link        https://github.com/mmikkel/Reasons-Craft
  */
 
+/**
+ * Class Reasons_ConditionalsRecord
+ * @package Craft
+ */
 class Reasons_ConditionalsRecord extends BaseRecord
 {
-	public function getTableName()
-	{
-		return 'reasons';
-	}
+    /**
+     * @return string
+     */
+    public function getTableName()
+    {
+        return 'reasons';
+    }
 
-	/**
-	 * @access protected
-	 * @return array
-	 */
-	protected function defineAttributes()
-	{
-		return array(
-			'fieldLayoutId' => AttributeType::Number,
-			'conditionals' => AttributeType::Mixed,
-		);
-	}
+    /**
+     * @access protected
+     * @return array
+     */
+    protected function defineAttributes()
+    {
+        return array(
+            'fieldLayoutId' => AttributeType::Number,
+            'conditionals' => AttributeType::Mixed,
+        );
+    }
 
-	/**
-	 * @access public
-	 * @return array
-	 */
-	public function defineRelations()
-	{
-		return array(
-			'fieldLayout' => array(
-				static::BELONGS_TO,
-				'FieldLayoutRecord',
-				'fieldLayoutId',
-				'onDelete' => static::CASCADE,
-			),
-		);
-	}
+    /**
+     * @access public
+     * @return array
+     */
+    public function defineRelations()
+    {
+        return array(
+            'fieldLayout' => array(
+                static::BELONGS_TO,
+                'FieldLayoutRecord',
+                'fieldLayoutId',
+                'onDelete' => static::CASCADE,
+            ),
+        );
+    }
 
 }

@@ -23,7 +23,7 @@ module.exports = class {
 
         this.addEventListeners();
         this.addLivePreviewListeners();
-        
+
         this.render();
 
         return this;
@@ -50,15 +50,15 @@ module.exports = class {
         function getLivePreviewInstance()
         {
             if (Craft.livePreview) {
-            
+
                 this._livePreview = Craft.livePreview;
                 this._livePreview.on('enter', $.proxy(this.onLivePreviewEnter, this));
                 this._livePreview.on('exit', $.proxy(this.onLivePreviewExit, this));
-                
+
                 if (this._livePreviewPollId) delete this._livePreviewPollId;
-            
+
             } else if (new Date().getTime() - now < 2000) {
-                
+
                 this._livePreviewPollId = Garnish.requestAnimationFrame(livePreviewPoller);
 
             }
@@ -131,25 +131,39 @@ module.exports = class {
         // Loop over fields and add data-id attribute
         var self = this,
             $field,
+            fieldHandlePath,
             fieldHandle,
             fieldId;
 
         this.$fields.each(function () {
+
             $field = $(this);
+
             if ($field.attr('id') === undefined) return;
-            fieldHandle = $field.attr('id').split('-').slice(-2, -1)[0] || false;
+
+            // Get field handle
+            fieldHandlePath = $field.attr('id').split('-');
+
+            if (fieldHandlePath.length < 3 || fieldHandlePath.length > 4) return; // Only basic fields for now!
+            fieldHandle = fieldHandlePath.slice(-2, -1)[0] || false;
+
+            if (!fieldHandle) return;
             fieldId = Craft.ReasonsPlugin.getFieldIdByHandle(fieldHandle);
+
             if (fieldId){
-                $field.attr('data-id',fieldId);
+                $field.attr('data-id', fieldId);
             }
+
             // Is this a target field?
             if (self.conditionals[fieldId]){
-                $field.attr('data-target',1);
+                $field.attr('data-target', 1);
             }
+
             // Is this a toggle field
             if (toggleFieldIds.indexOf(parseInt(fieldId)) > -1){
-                $field.attr('data-toggle',1);
+                $field.attr('data-toggle', 1);
             }
+
         });
 
         return true;
@@ -268,14 +282,12 @@ module.exports = class {
     */
     onLivePreviewEnter ()
     {
-        console.log('entered live preview');
         this.isLivePreview = true;
         this.render();
     }
 
     onLivePreviewExit ()
     {
-        console.log('exited live preview');
         this.isLivePreview = false;
         this.render();
     }
