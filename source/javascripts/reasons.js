@@ -17,6 +17,7 @@
         SECTION_HANDLE :            'section',
         USERS_HANDLE :              'users',
         FIELDS_HANDLE :             'field',
+        SOLSPACE_CALENDAR_HANDLE :  'solspaceCalendar',
 
         ASSET_SOURCE_ACTION :       'assetSources/saveSource',
         CATEGORY_ACTION :           'categories/saveCategory',
@@ -30,6 +31,8 @@
         USERS_ACTION :              'users/saveUser',
         USERS_FIELDS_ACTION :       'users/saveFieldLayout',
         FIELDS_ACTION :             'fields/saveField',
+        SOLSPACE_CALENDAR_EVENTS_ACTION :  'calendar/events/saveEvent',
+        SOLSPACE_CALENDAR_SETTINGS_ACTION:   'calendar/settings/saveSettings',
 
         RENDER_CONTEXT :            'render',
         LAYOUT_DESIGNER_CONTEXT :   'fld',
@@ -53,8 +56,9 @@
         initPrimaryForm : function ()
         {
             this.destroyPrimaryForm();
-            if (Craft.cp.$primaryForm) {
-                this.primaryForm = this.initForm(Craft.cp.$primaryForm);
+            var $form = (Craft.cp.$primaryForm && Craft.cp.$primaryForm.length) ? Craft.cp.$primaryForm : $('#content form:first');
+            if ($form && $form.length) {
+                this.primaryForm = this.initForm($form);
             }
         },
 
@@ -80,7 +84,7 @@
             }
 
             var now = new Date().getTime(),
-                doInitElementEditor = $.proxy(function () {
+                doInitElementEditor = (function () {
 
                     var timestamp = new Date().getTime(),
                         $elementEditor = $('.elementeditor:last'),
@@ -91,11 +95,11 @@
                     if ($form) {
                         elementEditor['_reasonsForm'] = new this.ConditionalsRenderer($form, conditionals);
                         elementEditor.hud.on('hide', $.proxy(this.destroyElementEditorForm, this, elementEditor));
-                    } else if (timestamp - now < 2000) {
+                    } else if (timestamp - now < 2000) { // Poll for 2 secs
                         Garnish.requestAnimationFrame(doInitElementEditor);
                     }
 
-                }, this);
+                }).bind(this);
 
             doInitElementEditor();
 
@@ -252,6 +256,11 @@
                     idInputSelector = 'input[type="hidden"][name="fieldId"]';
                     break;
 
+                case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
+                case this.SOLSPACE_CALENDAR_EVENTS_ACTION :
+                    type = this.SOLSPACE_CALENDAR_HANDLE;
+                    break;
+
             }
 
             if (!type) {
@@ -281,6 +290,7 @@
                 case this.TAG_ACTION :
                 case this.CATEGORY_ACTION :
                 case this.USERS_ACTION :
+                case this.SOLSPACE_CALENDAR_EVENTS_ACTION :
                     return this.RENDER_CONTEXT;
 
                 case this.ASSET_SOURCE_ACTION :
@@ -289,6 +299,7 @@
                 case this.ENTRY_TYPE_ACTION : 
                 case this.TAG_GROUP_ACTION :
                 case this.USERS_FIELDS_ACTION :
+                case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
                     return this.LAYOUT_DESIGNER_CONTEXT;
 
                 case this.FIELDS_ACTION :
@@ -303,3 +314,23 @@
     };
 
 }(window));
+
+if (window.jQuery) {
+    /*!
+     * jQuery.fn.hasAttr()
+     *
+     * Copyright 2011, Rick Waldron
+     * Licensed under MIT license.
+     *
+     */
+    (function( jQuery ) {
+      jQuery.fn.hasAttr = function( name ) {
+          for ( var i = 0, l = this.length; i < l; i++ ) {
+              if ( !!( this.attr( name ) !== undefined ) ) {
+                  return true;
+              }
+          }
+          return false;
+      };
+    })( jQuery );
+}

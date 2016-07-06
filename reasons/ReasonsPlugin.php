@@ -18,16 +18,16 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected $_version = '1.0.4',
-            $_schemaVersion = '1.1',
-            $_developer = 'Mats Mikkel Rummelhoff',
-            $_developerUrl = 'http://mmikkel.no',
-            $_pluginName = 'Reasons',
-            $_pluginUrl = 'https://github.com/mmikkel/Reasons-Craft',
-            $_releaseFeedUrl = 'https://raw.githubusercontent.com/mmikkel/Reasons-Craft/master/releases.json',
-            $_documentationUrl = 'https://github.com/mmikkel/Reasons-Craft/blob/master/README.md',
-            $_description = 'Adds conditionals to field layouts.',
-            $_minVersion = '2.5';
+    protected $_version = '1.0.5';
+    protected $_schemaVersion = '1.1';
+    protected $_developer = 'Mats Mikkel Rummelhoff';
+    protected $_developerUrl = 'http://mmikkel.no';
+    protected $_pluginName = 'Reasons';
+    protected $_pluginUrl = 'https://github.com/mmikkel/Reasons-Craft';
+    protected $_releaseFeedUrl = 'https://raw.githubusercontent.com/mmikkel/Reasons-Craft/master/releases.json';
+    protected $_documentationUrl = 'https://github.com/mmikkel/Reasons-Craft/blob/master/README.md';
+    protected $_description = 'Adds conditionals to field layouts.';
+    protected $_minVersion = '2.5';
 
     /**
      * @return string
@@ -162,7 +162,7 @@ class ReasonsPlugin extends BasePlugin
             $this->includeResources();
 
             craft()->templates->includeJs('if (window.Craft && window.Craft.ReasonsPlugin) {
-                Craft.ReasonsPlugin.init(' . $this->getData() . ');
+                Craft.ReasonsPlugin.init('.$this->getData().');
             }');
 
             craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
@@ -268,14 +268,19 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getData()
     {
-        if (!$data = craft()->fileCache->get($this->getCacheKey())) {
+        $doCacheData = !craft()->config->get('devMode');
+        $cacheKey = $this->getCacheKey();
+        $data = $doCacheData ? craft()->fileCache->get($cacheKey) : null;
+        if (!$data) {
             $data = array(
                 'conditionals' => $this->getConditionals(),
                 'toggleFieldTypes' => $this->getToggleFieldTypes(),
                 'toggleFields' => $this->getToggleFields(),
                 'fieldIds' => $this->getFieldIds(),
             );
-            craft()->fileCache->set($this->getCacheKey(), $data, 1800); // Cache for 30 minutes
+            if ($doCacheData) {
+                craft()->fileCache->set($this->getCacheKey(), $data, 1800); // Cache for 30 minutes
+            }
         }
         return json_encode($data);
     }
@@ -323,19 +328,28 @@ class ReasonsPlugin extends BasePlugin
             $sources['globalSet:' . $globalSet->id] = $globalSet->fieldLayoutId;
         }
 
-        // Matrix blocks
-        $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
-        if ($matrixBlockTypeRecords) {
-            foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
-                $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
-                $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
-            }
-        }
+        // Matrix blocks – TODO
+        // $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
+        // if ($matrixBlockTypeRecords) {
+        //     foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
+        //         $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
+        //         $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
+        //     }
+        // }
 
         // Users
         $usersFieldLayout = craft()->fields->getLayoutByType(ElementType::User);
         if ($usersFieldLayout) {
             $sources['users'] = $usersFieldLayout->id;
+        }
+
+        // Solspace Calendar
+        $solspaceCalendarPlugin = craft()->plugins->getPlugin('calendar');
+        if ($solspaceCalendarPlugin && $solspaceCalendarPlugin->getDeveloper() === 'Solspace') {
+            $solspaceCalendarFieldLayout = craft()->fields->getLayoutByType('Calendar_Event');
+            if ($solspaceCalendarFieldLayout) {
+                $sources['solspaceCalendar'] = $solspaceCalendarFieldLayout->id;
+            }
         }
 
         // Get all conditionals
@@ -367,6 +381,7 @@ class ReasonsPlugin extends BasePlugin
     protected function getToggleFieldTypes()
     {
         return array(
+            // Stock FieldTypes
             'Lightswitch',
             'Dropdown',
             'Checkboxes',
@@ -375,6 +390,13 @@ class ReasonsPlugin extends BasePlugin
             'Number',
             'PositionSelect',
             'PlainText',
+            'Entries',
+            'Categories',
+            'Tags',
+            'Assets',
+            'Users',
+            // Custom FieldTypes
+            'Calendar_Event',
         );
     }
 

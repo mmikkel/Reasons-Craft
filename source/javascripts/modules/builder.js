@@ -303,7 +303,7 @@ var ConditionalsBuilder = Garnish.Base.extend({
         switch (toggleFieldType) {
 
             // Lightswitch - true/false
-            case 'Lightswitch' :
+            case 'Lightswitch':
                 ruleValueContent = this.templates.select([
                     { true : Craft.t('on') },
                     { false : Craft.t('off') }
@@ -311,7 +311,7 @@ var ConditionalsBuilder = Garnish.Base.extend({
                 break;
 
             // Option based inputs
-            case 'Dropdown' : case 'MultiSelect' : case 'Checkboxes' : case 'RadioButtons' :
+            case 'Dropdown': case 'MultiSelect': case 'Checkboxes': case 'RadioButtons':
                 var values = toggleFieldSettings.options,
                     options = [],
                     option;
@@ -324,12 +324,12 @@ var ConditionalsBuilder = Garnish.Base.extend({
                 break;
 
             // Number input
-            case 'Number' :
+            case 'Number':
                 ruleValueContent = this.templates.number(toggleFieldSettings);
                 break;
 
             // // Color input
-            // case 'Color' :
+            // case 'Color':
             //     toggleFieldSettings = {
             //         placeholder : '#'
             //     };
@@ -337,7 +337,7 @@ var ConditionalsBuilder = Garnish.Base.extend({
             //     break;
 
             // Position Select
-            case 'PositionSelect' :
+            case 'PositionSelect':
                 var values = toggleFieldSettings.options,
                     options = [],
                     option;
@@ -346,6 +346,19 @@ var ConditionalsBuilder = Garnish.Base.extend({
                     option[values[ i ]] = values[ i ].charAt(0).toUpperCase() + values[ i ].slice(1);
                     options.push(option);
                 }
+                ruleValueContent = this.templates.select(options);
+                break;
+
+            // Relational fields
+            case 'Entries': case 'Categories': case 'Tags': case 'Assets': case 'Users': case 'Calendar_Event':
+                var options = [
+                    {
+                        'null': Craft.t('Empty').toLowerCase()
+                    },
+                    {
+                        'notnull': Craft.t('Not empty').toLowerCase()
+                    }
+                ];
                 ruleValueContent = this.templates.select(options);
                 break;
 
@@ -387,11 +400,11 @@ var ConditionalsBuilder = Garnish.Base.extend({
                     label = option[value];
                     selectOptions.push('<option value="' + value + '">' + label + '</option>');
                 }
-                return '<div class="' + (isMultiSelect ? 'multiselect' : 'select') + '"><select' + (isMultiSelect ? ' multiple' : '') + '>' + selectOptions.join('') + '</select></div>';
+                return '<div class="' + (isMultiSelect ? 'multiselect': 'select') + '"><select' + (isMultiSelect ? ' multiple': '') + '>' + selectOptions.join('') + '</select></div>';
             },
             toggleSelectOption : function(toggleField, selected)
             {
-                return '<option value="' + toggleField.id + '" data-type="' + toggleField.type + '"' + (selected ? ' selected' : '') + '>' + toggleField.name + '</option>';
+                return '<option value="' + toggleField.id + '" data-type="' + toggleField.type + '"' + (selected ? ' selected': '') + '>' + toggleField.name + '</option>';
             },
             number : function(settings)
             {

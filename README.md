@@ -1,4 +1,4 @@
-# Reasons v. 1.0.4 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.5 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -9,10 +9,8 @@ Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditiona
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
 ## Recent updates
-* Support for all native element types (Entries, Assets, Categories, Tags, Users and Global Sets)
-* Support for [Tag Manager](https://github.com/boboldehampsink/tagmanager)
-* Support for all native element editor modals
-* Support for Live Preview
+* Support for all native relational fields (Entries, Assets, Categories, Tags and Users) as toggle fields 
+* Support for Solspace Calendar
 
 ## Requirements
 
@@ -24,8 +22,6 @@ _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good id
 * Move the `/reasons` folder to your `/craft/plugins` folder
 * Install from the Control Panel (`/admin/settings/plugins`)
 
-**Important: Reasons requires Craft 2.5+.** Need Craft 2.4 or 2.3 support? Check out the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).  
-
 ## Usage and common questions
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
@@ -36,9 +32,9 @@ Note that for element sources that support tabbed field layouts, Reasons is desi
 
 ### What's a toggle field?
 
-A _toggle field_ in Reasons is a field that can be used to "toggle" another field (the _target field_) on or off (show or hide, as it were). This works by comparing the value of the toggle field declared inside the Field Layout Designer, to the current value of that same field when the content is edited.  
+A _toggle field_ in Reasons is a field that can be used to "toggle" another field (the _target field_) on or off (show or hide, as it were).  
 
-The following FieldTypes can be used as toggle fields:  
+The following stock FieldTypes can be used as toggle fields:  
 
 * Lightswitch
 * Dropdown
@@ -48,12 +44,31 @@ The following FieldTypes can be used as toggle fields:
 * Number
 * Position Select
 * Plain Text
+* Entries
+* Categories
+* Tags
+* Assets
+* Users
 
-All FieldTypes (even custom ones) can be target fields.  
+The following custom FieldTypes are also supported:  
 
-### Does Reasons work inside Matrix fields?
+* Solspace Events
 
-Nope, not yet. Work is underway for Matrix block type support, but it's pretty difficult and there's no ETA, unfortunately.
+### Where does it work?
+
+Reasons currently works for 
+
+* Entries
+* Categories
+* Tags
+* Assets
+* Users
+* Tag Manager
+* Solspace Calendar Events
+
+Reasons also works in Live Preview and Element Editor modals.  
+
+Unfortunately, Reasons does _not_ work inside Matrix blocks. Matrix support is hopefully coming in the future.  
 
 ### A note on required fields
 
@@ -93,6 +108,14 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.5 (07.06.2016)
+
+* [Added] Support for Entries, Assets, Tags, Users and Categories fieldtypes as toggle fields
+* [Added] Support for Solspace Calendar Events fieldtype as toggle fields
+* [Added] Full support for Solspace Calendar
+* [Improved] Reasons will no longer cache conditionals if devMode is enabled
+* [Improved] Hidden fields are no longer tabbable/focusable
 
 #### 1.0.4 (05.25.2016)
 

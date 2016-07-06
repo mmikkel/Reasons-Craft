@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.0.5",
+    "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+    "date": "2016-07-06T10:00:00-08:00",
+    "notes": [
+      "[Added] Support for Entries, Assets, Tags, Users and Categories fieldtypes as toggle fields",
+      "[Added] Support for Solspace Calendar Events fieldtype as toggle fields",
+      "[Added] Full support for Solspace Calendar",
+      "[Improved] Reasons will no longer cache conditionals if devMode is enabled",
+      "[Improved] Hidden fields are no longer tabbable/focusable"
+    ]
+  },
+  {
     "version": "1.0.4",
     "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
     "date": "2016-05-25T10:00:00-08:00",

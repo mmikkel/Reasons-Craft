@@ -21,27 +21,71 @@ module.exports = class {
 
         this.conditionals = conditionals;
 
-        this.addEventListeners();
-        this.addLivePreviewListeners();
-
-        this.render();
+        $(this.init.bind(this));
 
         return this;
 
     }
 
+    init ()
+    {
+        this.addEventListeners();
+        this.addLivePreviewListeners();
+        this.render();
+    }
+
     addEventListeners()
     {
+        
         Garnish.$doc
-            .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
-            .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
+            .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
+            .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', this.onFieldInputChange.bind(this));
+        
+        // Init element selects
+        var self = this,
+            elementSelectClassnames = ['elementselect', 'categoriesfield'],
+            elementSelect;
+
+        for (var i = 0; i < elementSelectClassnames.length; ++i) {
+            $(this.settings.fieldsSelector + ' .' + elementSelectClassnames[i]).each(function () {
+                if ($(this).hasAttr('data-reasonselementselect')) {
+                    return;
+                }
+                var now = new Date().getTime(),
+                    getElementSelect = (function () {
+                        elementSelect = $(this).data('elementSelect');
+                        if (elementSelect) {
+                            elementSelect.on('selectElements', self.onElementSelectChange.bind(self));
+                            elementSelect.on('removeElements', self.onElementSelectChange.bind(self));
+                            $(this).attr('data-reasonselementselect', '');
+                            self.onElementSelectChange();
+                        } else if (new Date().getTime() - now < 2000) {
+                            Garnish.requestAnimationFrame(getElementSelect);
+                        }
+                    }).bind(this);
+                getElementSelect();
+            });
+        }
+
     }
 
     removeEventListeners()
     {
+        
         Garnish.$doc
-            .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', $.proxy(this.onInputWrapperClick,this))
-            .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', $.proxy(this.onFieldInputChange,this));
+            .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
+            .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', this.onFieldInputChange.bind(this));
+        
+        var self = this,
+            elementSelect;
+
+        $('[data-reasonselementselect]').each(function () {
+            elementSelect = $(this).elementSelect;
+            elementSelect.off('selectElements', self.onElementSelectChange.bind(self));
+            elementSelect.off('removeElements', self.onElementSelectChange.bind(self));
+            $(this).removeAttr('[data-reasonselementselect]');
+        });
+
     }
 
     addLivePreviewListeners()
@@ -187,6 +231,8 @@ module.exports = class {
 
         $targetFields
             .removeClass('reasonsHide')
+            .removeAttr('aria-hidden')
+            .removeAttr('tabindex')
             .each(function(){
 
                 $targetField = $(this);
@@ -230,6 +276,10 @@ module.exports = class {
                                     return $(this).val();
                                 }).get();
                                 break;
+                            case 'Entries' : case 'Categories': case 'Tags': case 'Assets': case 'Users': case 'Calendar_Event':
+                                var elementSelect = $toggleField.find('[data-reasonselementselect]').data('elementSelect') || null;
+                                toggleFieldValue = elementSelect && elementSelect.totalSelected ? 'notnull' : 'null';
+                                break;
                             default :
                                 $toggleFieldInput = $toggleField.find('*:input:first');
                                 toggleFieldValue = $toggleFieldInput.val();
@@ -270,7 +320,10 @@ module.exports = class {
                 }
 
                 if (numValidStatements <= 0){
-                    $targetField.addClass('reasonsHide');
+                    $targetField
+                        .addClass('reasonsHide')
+                        .attr('aria-hidden', 'true')
+                        .attr('tabindex', '-1');
                 }
 
         });
@@ -304,6 +357,11 @@ module.exports = class {
     onFieldInputChange (e)
     {
         this.evaluateConditionals();
+    }
+
+    onElementSelectChange (e)
+    {
+        Garnish.requestAnimationFrame(this.evaluateConditionals.bind(this));
     }
 
 }
