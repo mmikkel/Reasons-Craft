@@ -96,10 +96,9 @@ My advice is to be smart about how you design your field layouts; always keeping
 
 ## Roadmap
 
-* Support for Matrix fields (in progress)
-* Support for Super Table fields
+* Matrix support (in progress)
+* Craft Commerce support
 * Better handling of required fields
-* Add support for the Button Box custom FieldType
 
 ## Disclaimer, bugs, feature request, support etc.
 
