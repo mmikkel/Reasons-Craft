@@ -1,4 +1,4 @@
-# Reasons v. 1.0.5 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.6 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -9,8 +9,9 @@ Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditiona
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
 ## Recent updates
+* Support for [Button Box](http://plugins.supercooldesign.co.uk/plugin/button-box) custom FieldTypes as toggle fields
 * Support for all native relational fields (Entries, Assets, Categories, Tags and Users) as toggle fields 
-* Support for Solspace Calendar
+* Support for [Solspace Calendar](https://solspace.com/craft/calendar)
 
 ## Requirements
 
@@ -26,7 +27,7 @@ _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good id
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
 
-To create or edit conditionals for a certain field, go to the settings for the appropriate element source (i.e. the Entry Type, Category Group, Tag Group, Global Set or Asset source), click the little cogwheel next to the field in the Field Layout Designer and choose "Manage conditionals".  
+To create or edit conditionals for a certain field, go to the settings for the appropriate element source (i.e. the Entry Type, Category Group, Tag Group, Global Set or Asset source), click the little cogwheel next to the field in the Field Layout Designer and choose "Edit conditionals".  
 
 Note that for element sources that support tabbed field layouts, Reasons is designed to work on a "per-tab" basis.  
 
@@ -52,7 +53,8 @@ The following stock FieldTypes can be used as toggle fields:
 
 The following custom FieldTypes are also supported:  
 
-* Solspace Events
+* [Solspace Events](https://solspace.com/craft/calendar)
+* [Button Box](http://plugins.supercooldesign.co.uk/plugin/button-box) (Buttons, Colours, Stars, Text Size and Width)
 
 ### Where does it work?
 
@@ -64,7 +66,7 @@ Reasons currently works for
 * Assets
 * Users
 * Tag Manager
-* Solspace Calendar Events
+* [Solspace Calendar Events](https://solspace.com/craft/calendar)
 
 Reasons also works in Live Preview and Element Editor modals.  
 
@@ -108,6 +110,12 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.6 (07.10.2016)
+
+* [Added] Support for the Button Box plugin fieldtypes as toggle fields
+* [Improved] Changed position and label for "Manage conditionals" in FLD
+* [Fixed] Lightswitch toggles now work when using the space key
 
 #### 1.0.5 (07.06.2016)
 

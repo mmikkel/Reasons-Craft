@@ -352,6 +352,18 @@ class ReasonsPlugin extends BasePlugin
             }
         }
 
+        // Commerce – TODO
+        // $commercePlugin = craft()->plugins->getPlugin('commerce');
+        // if ($commercePlugin && $commercePlugin->getDeveloper() === 'Pixel & Tonic') {
+        //     // Product types
+        //     $productTypes = craft()->commerce_productTypes->getAllProductTypes();
+        //     if ($productTypes) {
+        //         foreach ($productTypes as $productType) {
+        //             $sources['commerceProductType:'.$productType->id] = 
+        //         }
+        //     }
+        // }
+
         // Get all conditionals
         $conditionals = array();
         $conditionalsRecords = Reasons_ConditionalsRecord::model()->findAll();
@@ -397,6 +409,11 @@ class ReasonsPlugin extends BasePlugin
             'Users',
             // Custom FieldTypes
             'Calendar_Event',
+            'ButtonBox_Buttons',
+            'ButtonBox_Colours',
+            'ButtonBox_Stars',
+            'ButtonBox_TextSize',
+            'ButtonBox_Width',
         );
     }
 

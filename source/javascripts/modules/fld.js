@@ -155,11 +155,11 @@ module.exports = class {
                         .find('ul')
                         .children(':first')
                         .clone(true)
-                        .appendTo($menu.find('ul:first'))
+                        .insertBefore($menu.find('ul:first li:last'))
                         .find('a:first')
                             .data('_reasonsField', $field)
                             .attr('data-action', 'toggle-conditionals')
-                            .text(Craft.t('Manage conditionals'));
+                            .text(Craft.t('Edit conditionals'));
 
                     $field.data('_reasonsSettingsMenuItemInitialized',true);
 

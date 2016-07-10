@@ -4,11 +4,11 @@ module.exports = class {
     {
 
         this.settings = {
-            fieldsSelector : '.field:not(#title-field)',
-            livePreviewEditorSelector : '.lp-editor',
-            elementEditorSelector : '.elementeditor',
-            lightswitchContainerSelector : '.lightswitch',
-            positionSelectContainerSelector : '.btngroup'
+            fieldsSelector: '.field:not(#title-field)',
+            livePreviewEditorSelector: '.lp-editor',
+            elementEditorSelector: '.elementeditor',
+            lightswitchContainerSelector: '.lightswitch',
+            positionSelectContainerSelector: '.btngroup'
         };
 
         this.$el = $el;
@@ -36,10 +36,11 @@ module.exports = class {
 
     addEventListeners()
     {
-        
+
         Garnish.$doc
             .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
-            .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', this.onFieldInputChange.bind(this));
+            .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, '+this.settings.fieldsSelector + '[data-toggle="1"] '+this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
+            .on('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
         
         // Init element selects
         var self = this,
@@ -74,7 +75,8 @@ module.exports = class {
         
         Garnish.$doc
             .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
-            .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input', this.onFieldInputChange.bind(this));
+            .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, '+this.settings.fieldsSelector + '[data-toggle="1"] '+this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
+            .off('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
         
         var self = this,
             elementSelect;
@@ -265,22 +267,22 @@ module.exports = class {
 
                         switch (toggleFieldData.type)
                         {
-                            case 'Lightswitch' :
+                            case 'Lightswitch':
                                 $toggleFieldInput = $toggleField.find('*:input:first');
                                 if ($toggleFieldInput.length > 0) {
-                                    toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
+                                    toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true': 'false';
                                 }
                                 break;
-                            case 'Checkboxes' : case 'RadioButtons' :
+                            case 'Checkboxes': case 'RadioButtons': case 'ButtonBox_Buttons': case 'ButtonBox_Stars': case 'ButtonBox_Width':
                                 toggleFieldValue = $toggleField.find('input:checkbox:checked,input:radio:checked').map(function(){
                                     return $(this).val();
                                 }).get();
                                 break;
-                            case 'Entries' : case 'Categories': case 'Tags': case 'Assets': case 'Users': case 'Calendar_Event':
+                            case 'Entries': case 'Categories': case 'Tags': case 'Assets': case 'Users': case 'Calendar_Event':
                                 var elementSelect = $toggleField.find('[data-reasonselementselect]').data('elementSelect') || null;
                                 toggleFieldValue = elementSelect && elementSelect.totalSelected ? 'notnull' : 'null';
                                 break;
-                            default :
+                            default:
                                 $toggleFieldInput = $toggleField.find('*:input:first');
                                 toggleFieldValue = $toggleFieldInput.val();
                                 break;

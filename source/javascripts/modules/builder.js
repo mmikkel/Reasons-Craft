@@ -311,7 +311,7 @@ var ConditionalsBuilder = Garnish.Base.extend({
                 break;
 
             // Option based inputs
-            case 'Dropdown': case 'MultiSelect': case 'Checkboxes': case 'RadioButtons':
+            case 'Dropdown': case 'MultiSelect': case 'Checkboxes': case 'RadioButtons': case 'ButtonBox_Buttons': case 'ButtonBox_Colours': case 'ButtonBox_TextSize': case 'ButtonBox_Width':
                 var values = toggleFieldSettings.options,
                     options = [],
                     option;
@@ -326,6 +326,19 @@ var ConditionalsBuilder = Garnish.Base.extend({
             // Number input
             case 'Number':
                 ruleValueContent = this.templates.number(toggleFieldSettings);
+                break;
+
+            // Button Box – Stars
+            case 'ButtonBox_Stars':
+                var numStars = parseInt(toggleFieldSettings.numStars) + 1,
+                    option,
+                    options = [];
+                for (var i = 0; i < numStars; ++i) {
+                    option = {};
+                    option[''+i] = i;
+                    options.push(option);
+                }
+                ruleValueContent = this.templates.select(options);
                 break;
 
             // // Color input

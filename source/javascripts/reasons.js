@@ -18,6 +18,7 @@
         USERS_HANDLE :              'users',
         FIELDS_HANDLE :             'field',
         SOLSPACE_CALENDAR_HANDLE :  'solspaceCalendar',
+        //COMMERCE_PRODUCT_TYPE_HANDLE : 'commerceProductType',
 
         ASSET_SOURCE_ACTION :       'assetSources/saveSource',
         CATEGORY_ACTION :           'categories/saveCategory',
@@ -32,7 +33,9 @@
         USERS_FIELDS_ACTION :       'users/saveFieldLayout',
         FIELDS_ACTION :             'fields/saveField',
         SOLSPACE_CALENDAR_EVENTS_ACTION :  'calendar/events/saveEvent',
-        SOLSPACE_CALENDAR_SETTINGS_ACTION:   'calendar/settings/saveSettings',
+        SOLSPACE_CALENDAR_SETTINGS_ACTION : 'calendar/settings/saveSettings',
+        // COMMERCE_PRODUCT_TYPE_ACTION : 'commerce/productTypes/saveProductType',
+        // COMMERCE_PRODUCT_ACTION : 'commerce/products/saveProduct',
 
         RENDER_CONTEXT :            'render',
         LAYOUT_DESIGNER_CONTEXT :   'fld',
@@ -261,6 +264,12 @@
                     type = this.SOLSPACE_CALENDAR_HANDLE;
                     break;
 
+                case this.COMMERCE_PRODUCT_TYPE_ACTION :
+                case this.COMMERCE_PRODUCT_ACTION :
+                    type = this.COMMERCE_PRODUCT_TYPE_HANDLE;
+                    idInputSelector = 'input[type="hidden"][name="typeId"]';
+                    break;
+
             }
 
             if (!type) {
@@ -291,6 +300,7 @@
                 case this.CATEGORY_ACTION :
                 case this.USERS_ACTION :
                 case this.SOLSPACE_CALENDAR_EVENTS_ACTION :
+                case this.COMMERCE_PRODUCT_ACTION :
                     return this.RENDER_CONTEXT;
 
                 case this.ASSET_SOURCE_ACTION :
@@ -300,6 +310,7 @@
                 case this.TAG_GROUP_ACTION :
                 case this.USERS_FIELDS_ACTION :
                 case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
+                case this.COMMERCE_PRODUCT_TYPE_ACTION :
                     return this.LAYOUT_DESIGNER_CONTEXT;
 
                 case this.FIELDS_ACTION :
