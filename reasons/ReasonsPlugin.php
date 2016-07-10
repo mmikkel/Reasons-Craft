@@ -18,7 +18,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected $_version = '1.0.5';
+    protected $_version = '1.0.6';
     protected $_schemaVersion = '1.1';
     protected $_developer = 'Mats Mikkel Rummelhoff';
     protected $_developerUrl = 'http://mmikkel.no';
