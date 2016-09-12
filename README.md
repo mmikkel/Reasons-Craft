@@ -1,4 +1,4 @@
-# Reasons v. 1.0.6 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.1.0 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -9,9 +9,8 @@ Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditiona
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
 ## Recent updates
-* Support for [Button Box](http://plugins.supercooldesign.co.uk/plugin/button-box) custom FieldTypes as toggle fields
-* Support for all native relational fields (Entries, Assets, Categories, Tags and Users) as toggle fields 
-* Support for [Solspace Calendar](https://solspace.com/craft/calendar)
+* Full support for Craft Commerce
+* Support for Matrix fields
 
 ## Requirements
 
@@ -65,12 +64,12 @@ Reasons currently works for
 * Tags
 * Assets
 * Users
+* Matrix
 * Tag Manager
+* Craft Commerce
 * [Solspace Calendar Events](https://solspace.com/craft/calendar)
 
-Reasons also works in Live Preview and Element Editor modals.  
-
-Unfortunately, Reasons does _not_ work inside Matrix blocks. Matrix support is hopefully coming in the future.  
+_Reasons also works in Live Preview, drafts and Element Editor modals._  
 
 ### A note on required fields
 
@@ -96,9 +95,7 @@ My advice is to be smart about how you design your field layouts; always keeping
 
 ## Roadmap
 
-* Matrix support (in progress)
-* Craft Commerce support
-* Better handling of required fields
+* Something you want to see? [Add a feature request](https://github.com/mmikkel/Reasons-Craft/issues)!
 
 ## Disclaimer, bugs, feature request, support etc.
 
@@ -109,6 +106,16 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 2.0 (09.10.2016)
+
+* [Added] Support for Matrix
+* [Added] Support for Craft Commerce (including variants)
+* [Added] Support for the Preparse custom fieldtype by @aelvan
+* [Added] Ability for custom fieldtypes to add Reasons support
+* [Improved] Basically rewrote the entire thing (the JavaScript part, anyway)
+* [Improved] It's now impossible to add conditionals to required fields
+* [Fixed] Reasons now works with Drafts
 
 #### 1.0.6 (07.10.2016)
 

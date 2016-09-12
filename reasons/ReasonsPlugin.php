@@ -18,7 +18,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected $_version = '1.0.6';
+    protected $_version = '2.0.0';
     protected $_schemaVersion = '1.1';
     protected $_developer = 'Mats Mikkel Rummelhoff';
     protected $_developerUrl = 'http://mmikkel.no';
@@ -160,10 +160,10 @@ class ReasonsPlugin extends BasePlugin
         } else {
 
             $this->includeResources();
-
-            craft()->templates->includeJs('if (window.Craft && window.Craft.ReasonsPlugin) {
-                Craft.ReasonsPlugin.init('.$this->getData().');
-            }');
+            
+            $data = $this->getData();
+            
+            craft()->templates->includeJs('Craft.ReasonsPlugin.init('.$data.');');
 
             craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
 
@@ -186,7 +186,7 @@ class ReasonsPlugin extends BasePlugin
         }
 
         $segments = craft()->request->segments;
-        $actionSegment = $segments[count($segments) - 1];
+        $actionSegment = is_array($segments) && !empty($segments) ? $segments[count($segments) - 1] : null;
 
         switch ($actionSegment) {
 
@@ -203,46 +203,46 @@ class ReasonsPlugin extends BasePlugin
                 $elementType = $element ? $element->elementType : craft()->request->getPost('elementType');
                 $attributes = craft()->request->getPost('attributes');
 
-                $conditionalsKey = null;
+                $context = null;
 
                 switch ($elementType) {
 
                     case ElementType::Entry :
                         if ($element) {
-                            $conditionalsKey = 'entryType:' . $element->type->id;
+                            $context = 'entryType:' . $element->type->id;
                         } else if (isset($attributes['typeId'])) {
-                            $conditionalsKey = 'entryType:' . $attributes['typeId'];
+                            $context = 'entryType:' . $attributes['typeId'];
                         } else if (isset($attributes['sectionId'])) {
                             $entryTypes = craft()->sections->getEntryTypesBySectionId((int)$attributes['sectionId']);
                             $entryType = $entryTypes ? array_shift($entryTypes) : false;
-                            $conditionalsKey = $entryType ? 'entryType:' . $entryType->id : null;
+                            $context = $entryType ? 'entryType:' . $entryType->id : null;
                         }
                         break;
 
                     case ElementType::GlobalSet :
-                        $conditionalsKey = $element ? 'globalSet:' . $element->id : null;
+                        $context = $element ? 'globalSet:' . $element->id : null;
                         break;
 
                     case ElementType::Asset :
-                        $conditionalsKey = $element ? 'assetSource:' . $element->source->id : null;
+                        $context = $element ? 'assetSource:' . $element->source->id : null;
                         break;
 
                     case ElementType::Category :
-                        $conditionalsKey = $element ? 'categoryGroup:' . $element->group->id : null;
+                        $context = $element ? 'categoryGroup:' . $element->group->id : null;
                         break;
 
                     case ElementType::Tag :
-                        $conditionalsKey = $element ? 'tagGroup:' . $element->group->id : null;
+                        $context = $element ? 'tagGroup:' . $element->group->id : null;
                         break;
 
                     case ElementType::User :
-                        $conditionalsKey = 'users';
+                        $context = 'users';
                         break;
 
                 }
 
-                if ($conditionalsKey) {
-                    craft()->templates->includeJs('Craft.ReasonsPlugin.initElementEditor("' . $conditionalsKey . '");');
+                if ($context) {
+                    craft()->templates->includeJs('Craft.ReasonsPlugin.initElementEditor("'.$context.'");');
                 }
 
                 break;
@@ -256,11 +256,12 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function includeResources()
     {
-        $cssFile = 'stylesheets/reasons.css';
-        $jsFile = 'javascripts/reasons.js';
-        $manifest = $this->getRevisionManifest();
-        craft()->templates->includeCssResource('reasons/' . ($manifest ? $manifest->$cssFile : $cssFile));
-        craft()->templates->includeJsResource('reasons/' . ($manifest ? $manifest->$jsFile : $jsFile));
+        // $cssFile = 'stylesheets/reasons.css';
+        // $jsFile = 'javascripts/reasons.js';
+        // $manifest = $this->getRevisionManifest();
+        // craft()->templates->includeCssResource('reasons/' . ($manifest ? $manifest->$cssFile : $cssFile));
+        // craft()->templates->includeJsResource('reasons/' . ($manifest ? $manifest->$jsFile : $jsFile));
+        craft()->templates->includeJsResource('reasons/reasons.js');
     }
 
     /**
@@ -392,8 +393,8 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getToggleFieldTypes()
     {
-        return array(
-            // Stock FieldTypes
+        
+        $stockFieldTypes = array(
             'Lightswitch',
             'Dropdown',
             'Checkboxes',
@@ -407,14 +408,28 @@ class ReasonsPlugin extends BasePlugin
             'Tags',
             'Assets',
             'Users',
-            // Custom FieldTypes
+        );
+        
+        $customFieldTypes = array(
             'Calendar_Event',
             'ButtonBox_Buttons',
             'ButtonBox_Colours',
             'ButtonBox_Stars',
             'ButtonBox_TextSize',
             'ButtonBox_Width',
+            'PreparseField_Preparse',
         );
+        
+        $fieldTypes = array_merge($stockFieldTypes, $customFieldTypes);
+
+        $additionalFieldTypes = craft()->plugins->call('defineAdditionalReasonsToggleFieldTypes', array(), true);
+
+        foreach ($additionalFieldTypes as $pluginHandle => $pluginFieldTypes) {
+            $fieldTypes = array_merge($fieldTypes, $pluginFieldTypes);            
+        }
+        
+        return $fieldTypes;
+
     }
 
     /*
@@ -441,6 +456,7 @@ class ReasonsPlugin extends BasePlugin
                     'handle' => $field->handle,
                     'name' => $field->name,
                     'type' => $classHandle,
+                    'contentAttribute' => $fieldType->defineContentAttribute() ?: false,
                     'settings' => $field->settings,
                 );
             }
@@ -466,7 +482,7 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getRevisionManifest()
     {
-        $manifestPath = craft()->path->getPluginsPath() . '/reasons/resources/rev-manifest.json';
+        $manifestPath = craft()->path->getPluginsPath().'/reasons/resources/rev-manifest.json';
         return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? json_decode($manifest) : false;
     }
 
@@ -475,7 +491,7 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getCacheKey()
     {
-        return $this->_pluginName . '_' . $this->_version . '_' . $this->_schemaVersion;
+        return $this->_pluginName.'_'.$this->_version.'_'.$this->_schemaVersion;
     }
 
     /*
@@ -487,12 +503,13 @@ class ReasonsPlugin extends BasePlugin
      */
     public function onSaveFieldLayout(Event $e)
     {
-        $conditionals = craft()->request->getPost('_reasons');
+        ReasonsPlugin::log('Saving a field layout yo!');
+        $conditionals = craft()->request->getPost('_reasonsPlugin');
         if ($conditionals) {
             $fieldLayout = $e->params['layout'];
             $conditionalsModel = new Reasons_ConditionalsModel();
             $conditionalsModel->fieldLayoutId = $fieldLayout->id;
-            $conditionalsModel->conditionals = craft()->request->getPost('_reasons');
+            $conditionalsModel->conditionals = $conditionals;
             craft()->reasons->saveConditionals($conditionalsModel);
         }
         craft()->fileCache->delete($this->getCacheKey());
