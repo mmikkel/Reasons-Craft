@@ -1,4 +1,4 @@
-# Reasons v. 1.0.6 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.7 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -109,6 +109,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.7 (10.01.2016)
+
+* [Fixed] Fixes minor JavaScript bug (thanks @benf!)
 
 #### 1.0.6 (07.10.2016)
 

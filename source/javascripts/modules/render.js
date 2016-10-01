@@ -82,9 +82,11 @@ module.exports = class {
             elementSelect;
 
         $('[data-reasonselementselect]').each(function () {
-            elementSelect = $(this).elementSelect;
-            elementSelect.off('selectElements', self.onElementSelectChange.bind(self));
-            elementSelect.off('removeElements', self.onElementSelectChange.bind(self));
+            elementSelect = $(this).data('elementSelect');
+            if (elementSelect) {
+                elementSelect.off('selectElements', self.onElementSelectChange.bind(self));
+                elementSelect.off('removeElements', self.onElementSelectChange.bind(self));
+            }
             $(this).removeAttr('[data-reasonselementselect]');
         });
 
