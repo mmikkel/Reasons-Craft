@@ -1,4 +1,4 @@
-# Reasons v. 1.0.7 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.8 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
@@ -10,7 +10,7 @@ _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good id
 
 ## Recent updates
 * Support for [Button Box](http://plugins.supercooldesign.co.uk/plugin/button-box) custom FieldTypes as toggle fields
-* Support for all native relational fields (Entries, Assets, Categories, Tags and Users) as toggle fields 
+* Support for all native relational fields (Entries, Assets, Categories, Tags and Users) as toggle fields
 * Support for [Solspace Calendar](https://solspace.com/craft/calendar)
 
 ## Requirements
@@ -58,7 +58,7 @@ The following custom FieldTypes are also supported:
 
 ### Where does it work?
 
-Reasons currently works for 
+Reasons currently works for
 
 * Entries
 * Categories
@@ -109,6 +109,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.8 (19.11.2016)
+
+* [Fixed] Fixes issue with AND conditionals not working as expected
 
 #### 1.0.7 (10.01.2016)
 

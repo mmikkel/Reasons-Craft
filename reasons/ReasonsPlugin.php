@@ -18,7 +18,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected $_version = '1.0.7';
+    protected $_version = '1.0.8';
     protected $_schemaVersion = '1.1';
     protected $_developer = 'Mats Mikkel Rummelhoff';
     protected $_developerUrl = 'http://mmikkel.no';
@@ -359,7 +359,7 @@ class ReasonsPlugin extends BasePlugin
         //     $productTypes = craft()->commerce_productTypes->getAllProductTypes();
         //     if ($productTypes) {
         //         foreach ($productTypes as $productType) {
-        //             $sources['commerceProductType:'.$productType->id] = 
+        //             $sources['commerceProductType:'.$productType->id] =
         //         }
         //     }
         // }

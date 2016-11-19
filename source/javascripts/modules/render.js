@@ -41,7 +41,7 @@ module.exports = class {
             .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
             .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, '+this.settings.fieldsSelector + '[data-toggle="1"] '+this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
             .on('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
-        
+
         // Init element selects
         var self = this,
             elementSelectClassnames = ['elementselect', 'categoriesfield'],
@@ -72,12 +72,12 @@ module.exports = class {
 
     removeEventListeners()
     {
-        
+
         Garnish.$doc
             .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
             .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, '+this.settings.fieldsSelector + '[data-toggle="1"] '+this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
             .off('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
-        
+
         var self = this,
             elementSelect;
 
@@ -169,10 +169,14 @@ module.exports = class {
         }
 
         // Get toggle field IDs
+        var fieldIds = Object.keys(this.conditionals);
         var toggleFieldIds = [];
-        for (fieldId in this.conditionals) {
-            for (var i = 0; i < this.conditionals[fieldId].length; ++i){
-                toggleFieldIds.push(this.conditionals[fieldId][i][0].fieldId);
+        var statements;
+
+        for (var i = 0; i < fieldIds.length; ++i) {
+            statements = this.conditionals[fieldIds[i]][0];
+            for (var j = 0; j < statements.length; ++j) {
+              toggleFieldIds.push(statements[j].fieldId);
             }
         }
 

@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.0.8",
+    "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+    "date": "2016-11-19T10:00:00-08:00",
+    "notes": [
+      "[Fixed] Fixes issue with AND conditionals not working as expected"
+    ]
+  },
+  {
     "version": "1.0.7",
     "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
     "date": "2016-10-01T10:00:00-08:00",

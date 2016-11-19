@@ -41,7 +41,7 @@
         LAYOUT_DESIGNER_CONTEXT :   'fld',
         FIELD_DESIGNER_CONTEXT :    'field',
 
-        
+
         /*
         *   Initialize Reasons
         *
@@ -81,7 +81,7 @@
         {
 
             var conditionals = this.getConditionals(conditionalsKey);
-            
+
             if (!conditionals) {
                 return false;
             }
@@ -238,7 +238,7 @@
                     idInputSelector = $entryType.length ? 'select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType' : 'input[type="hidden"][name="sectionId"], #' + namespace + 'section';
                     break;
 
-                case this.ENTRY_TYPE_ACTION : 
+                case this.ENTRY_TYPE_ACTION :
                     type = this.ENTRY_TYPE_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="entryTypeId"]';
                     break;
@@ -280,7 +280,7 @@
                 type : type,
                 id : idInputSelector ? ($form.find(idInputSelector).val() | 0) : false
             };
-                
+
         },
 
         getFormContext : function ($form)
@@ -306,7 +306,7 @@
                 case this.ASSET_SOURCE_ACTION :
                 case this.CATEGORY_GROUP_ACTION :
                 case this.GLOBAL_SET_ACTION :
-                case this.ENTRY_TYPE_ACTION : 
+                case this.ENTRY_TYPE_ACTION :
                 case this.TAG_GROUP_ACTION :
                 case this.USERS_FIELDS_ACTION :
                 case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
@@ -315,7 +315,7 @@
 
                 case this.FIELDS_ACTION :
                     return this.FIELD_DESIGNER_CONTEXT;
-                
+
             }
 
             return false;
