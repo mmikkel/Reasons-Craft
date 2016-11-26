@@ -160,9 +160,9 @@ class ReasonsPlugin extends BasePlugin
         } else {
 
             $this->includeResources();
-            
+
             $data = $this->getData();
-            
+
             craft()->templates->includeJs('Craft.ReasonsPlugin.init('.$data.');');
 
             craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
@@ -360,7 +360,7 @@ class ReasonsPlugin extends BasePlugin
         //     $productTypes = craft()->commerce_productTypes->getAllProductTypes();
         //     if ($productTypes) {
         //         foreach ($productTypes as $productType) {
-        //             $sources['commerceProductType:'.$productType->id] = 
+        //             $sources['commerceProductType:'.$productType->id] =
         //         }
         //     }
         // }
@@ -393,7 +393,7 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getToggleFieldTypes()
     {
-        
+
         $stockFieldTypes = array(
             'Lightswitch',
             'Dropdown',
@@ -409,7 +409,7 @@ class ReasonsPlugin extends BasePlugin
             'Assets',
             'Users',
         );
-        
+
         $customFieldTypes = array(
             'Calendar_Event',
             'ButtonBox_Buttons',
@@ -419,15 +419,15 @@ class ReasonsPlugin extends BasePlugin
             'ButtonBox_Width',
             'PreparseField_Preparse',
         );
-        
+
         $fieldTypes = array_merge($stockFieldTypes, $customFieldTypes);
 
         $additionalFieldTypes = craft()->plugins->call('defineAdditionalReasonsToggleFieldTypes', array(), true);
 
         foreach ($additionalFieldTypes as $pluginHandle => $pluginFieldTypes) {
-            $fieldTypes = array_merge($fieldTypes, $pluginFieldTypes);            
+            $fieldTypes = array_merge($fieldTypes, $pluginFieldTypes);
         }
-        
+
         return $fieldTypes;
 
     }
