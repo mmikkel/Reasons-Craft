@@ -64,6 +64,8 @@ export default class FieldLayoutDesigner {
     this.fld = fld
     this.$input = $('<input type="hidden" name="_reasonsPlugin" value="" />').appendTo(this.fld.$container)
 
+    console.log('init fld', formAttributes.conditionals)
+
     this.setConditionals(formAttributes.conditionals)
     this.update()
 
@@ -142,6 +144,8 @@ export default class FieldLayoutDesigner {
 
       })
 
+      this.setConditionals(conditionals)
+
     })
 
   }
@@ -155,6 +159,7 @@ export default class FieldLayoutDesigner {
   }
 
   setConditionals (conditionals) {
+    console.log('set conditionals', conditionals)
     this.conditionals = conditionals
     if (!this.conditionals || Object.keys(this.conditionals).length === 0){
         this.$input.attr('value', '')

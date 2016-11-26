@@ -46,6 +46,8 @@ export default class Reasons {
 
     const formAttributes = Reasons.getFormAttributes()
 
+    console.log('reasons form attributes', formAttributes)
+
     if (formAttributes.context === constants.PARSER_CONTEXT && formAttributes.conditionals) {
       console.log('init parser')
       this.parser = new FormParser($form, formAttributes.conditionals)
