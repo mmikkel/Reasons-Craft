@@ -1,5 +1,7 @@
 import Craft from 'craft';
 
+import each from 'lodash/each'
+
 import 'styles/reasons.scss'
 import 'lib/jquery-extensions'
 
@@ -7,8 +9,9 @@ import * as constants from 'core/constants'
 
 import FieldLayoutDesigner from 'modules/FieldLayoutDesigner'
 import MatrixConfigurator from 'modules/MatrixConfigurator'
-import FormParser from 'modules/FormParser'
-import MatrixParser from 'modules/MatrixParser'
+import ElementEditor from 'modules/ElementEditor'
+import EditForm from 'modules/EditForm'
+//import MatrixParser from 'modules/MatrixParser'
 
 export default class Reasons {
 
@@ -18,59 +21,62 @@ export default class Reasons {
 
     Reasons.data = data;
 
-    // Add classes to override
-    const classes = { FieldLayoutDesigner, MatrixConfigurator }
-    for (var className in classes) {
-      const reasonsClass = classes[className]
+    const hijackClasses = { FieldLayoutDesigner, MatrixConfigurator, ElementEditor }
+    for (var className in hijackClasses) {
+      const _class = hijackClasses[className]
       const craftClass = Craft[className] || null
       if (!craftClass) {
         continue
       }
-      new reasonsClass(craftClass)
+      new _class(craftClass)
     }
 
-    // Init the form parser
-    $(this.initParser.bind(this))
-
-    console.info('Reasons init', Reasons.data);
+    $(this.initPrimaryForm.bind(this))
 
   }
 
-  /*
-  * Initializes the primary parser on the page
-  *
-  */
-  initParser () {
+  initPrimaryForm () {
 
-    this.destroyParser();
+    this.destroyPrimaryForm();
 
     const formAttributes = Reasons.getFormAttributes()
 
-    console.log('reasons form attributes', formAttributes)
-
-    if (formAttributes.context === constants.PARSER_CONTEXT && formAttributes.conditionals) {
-      console.log('init parser')
-      this.parser = new FormParser($form, formAttributes.conditionals)
+    if (formAttributes.context === constants.FORM_PARSER_CONTEXT && formAttributes.conditionals) {
+      const $form = Reasons.getPrimaryForm()
+      this.editForm = new EditForm($form, formAttributes.conditionals)
     }
 
   }
 
-  destroyParser () {
-    if (this.parser) {
-      this.parser.destroy()
-      delete this.parser
+  destroyPrimaryForm () {
+    if (this.editForm) {
+      this.editForm.destroy()
+      delete this.editForm
     }
+  }
+
+  setElementEditorSource (elementId, source) {
+    if (!Reasons.elementEditorSources) Reasons.elementEditorSources = {}
+    Reasons.elementEditorSources[elementId.toString()] = source
   }
 
   /*
   *   Core methods
   *
   */
-  static getConditionals (context) {
-      return context ? (Reasons.data.conditionals && Reasons.data.conditionals.hasOwnProperty(context) ? Reasons.data.conditionals[context] : null) : (Reasons.data.conditionals || {})
+  static getPrimaryForm () {
+    return (Craft.cp.$primaryForm && Craft.cp.$primaryForm.length) ? Craft.cp.$primaryForm : $('#content form:first')
   }
 
-  static getConditionalContextFromAttributes (attributes) {
+  static getConditionalsForSource (source) {
+    return Reasons.data.conditionals ? Reasons.data.conditionals[source] || null : null
+  }
+
+  static getConditionals () {
+    return Reasons.data.conditionals ? Reasons.data.conditionals : null
+  }
+
+  static getSourceFromAttributes (attributes) {
     return attributes.type + (attributes.id ? ':' + attributes.id : '')
   }
 
@@ -79,39 +85,39 @@ export default class Reasons {
   }
 
   static getToggleFieldById (fieldId) {
-      fieldId = parseInt(fieldId)
-      const toggleFields = Reasons.getToggleFields()
-      const numToggleFields = toggleFields.length
-      for (let i = 0; i < numToggleFields; ++i) {
-          if (parseInt(toggleFields[i].id) === fieldId){
-              return toggleFields[i]
-          }
-      }
-      return false
+    fieldId = parseInt(fieldId)
+    const toggleFields = Reasons.getToggleFields()
+    const numToggleFields = toggleFields.length
+    for (let i = 0; i < numToggleFields; ++i) {
+        if (parseInt(toggleFields[i].id) === fieldId){
+            return toggleFields[i]
+        }
+    }
+    return false
   }
 
   static getFieldIds () {
-      return Reasons.data.fieldIds ? Reasons.data.fieldIds : {}
+    return Reasons.data.fieldIds ? Reasons.data.fieldIds : {}
   }
 
   static getFieldIdByHandle (fieldHandle) {
-      const fieldIds = Reasons.getFieldIds()
-      return fieldIds && fieldIds.hasOwnProperty(fieldHandle) ? fieldIds[fieldHandle] : false
+    const fieldIds = Reasons.getFieldIds()
+    return fieldIds && fieldIds.hasOwnProperty(fieldHandle) ? fieldIds[fieldHandle] : false
   }
 
   static getToggleFieldTypes () {
-      return Reasons.data.toggleFieldTypes ? Reasons.data.toggleFieldTypes : []
+    return Reasons.data.toggleFieldTypes ? Reasons.data.toggleFieldTypes : []
   }
 
   static getFormAttributes ($form) {
 
-    if (!$form) {
-      $form = (Craft.cp.$primaryForm && Craft.cp.$primaryForm.length) ? Craft.cp.$primaryForm : $('#content form:first');
-      if (!$form || !$form.length) return false;
-    }
+    console.log('get form attributes', $form)
 
-    if ($form.data('elementEditor')) {
-        return false;
+    if (!$form || !$form.length) {
+      $form = Reasons.getPrimaryForm()
+      if (!$form || !$form.length) {
+        return false
+      }
     }
 
     // Get namespace
@@ -193,8 +199,8 @@ export default class Reasons {
         id : idInputSelector ? ($form.find(idInputSelector).val() | 0) : false
     }
 
-    const conditionalsContext = Reasons.getConditionalContextFromAttributes(attrs)
-    attrs['conditionals'] = Reasons.getConditionals(conditionalsContext)
+    const source = Reasons.getSourceFromAttributes(attrs)
+    attrs['conditionals'] = Reasons.getConditionalsForSource(source)
 
     return attrs
 
@@ -236,6 +242,10 @@ export default class Reasons {
 
       return false
 
+  }
+
+  static getElementEditorSource (elementId) {
+    return Reasons.elementEditorSources ? Reasons.elementEditorSources[elementId.toString()] || null : null
   }
 
 }

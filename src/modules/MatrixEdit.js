@@ -1,4 +1,4 @@
-export default class MatrixParser {
+export default class MatrixEdit {
 
   constructor () {
     console.log('matrix parser init');

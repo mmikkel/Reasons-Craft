@@ -57,7 +57,7 @@ The following custom FieldTypes are also supported:
 
 ### Where does it work?
 
-Reasons currently works for 
+Reasons currently works for
 
 * Entries
 * Categories
@@ -107,15 +107,16 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 
 ### Changelog
 
-#### 2.0 (09.10.2016)
+#### 2.0.0 (09.10.2016)
 
 * [Added] Support for Matrix
 * [Added] Support for Craft Commerce (including variants)
 * [Added] Support for the Preparse custom fieldtype by @aelvan
-* [Added] Ability for custom fieldtypes to add Reasons support
+* [Added] Ability for custom FieldTypes to add Reasons support
+* [Improved] Conditionals are no longer confined to tabs
 * [Improved] Basically rewrote the entire thing (the JavaScript part, anyway)
 * [Improved] It's now impossible to add conditionals to required fields
-* [Fixed] Reasons now works with Drafts
+* [Fixed] Reasons now works with drafts
 
 #### 1.0.6 (07.10.2016)
 

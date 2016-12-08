@@ -6,11 +6,11 @@ import { OPTION_BASED_FIELDTYPES } from 'core/settings'
 export default class MatrixConfigurator {
 
   constructor (matrixClass) {
-    
+
     const fn = matrixClass.prototype;
     const fnInit = fn.init;
     const self = this;
-    
+
     fn.init = function () {
       fnInit.apply(this, arguments);
       self.init(this);
@@ -19,12 +19,14 @@ export default class MatrixConfigurator {
   }
 
   init (configurator) {
-    
+
     this.configurator = configurator;
+
+    console.log('matrix configurator init')
 
     // Init existing block types
     for (var id in this.configurator.blockTypes) {
-      this.initBlockType(this.configurator.blockTypes[id]);
+      this.initBlockType(this.configurator.blockTypes[id])
     }
 
   }
@@ -37,16 +39,18 @@ export default class MatrixConfigurator {
 
   initBlockType (blockType) {
 
+    console.log('init block type')
+
     // Sneaky.
     blockType._reasons = {
       $input: $('<input type="hidden" name="types[Matrix][blockTypes]['+blockType.id+'][_reasonsPlugin]" value="" />').appendTo(blockType.$item)
-    };
-    
+    }
+
     // Init fields
     for (var id in blockType.fields) {
-      this.initField(blockType.fields[id]);
+      this.initField(blockType.fields[id])
     }
-    
+
     return blockType;
 
   }
@@ -61,6 +65,8 @@ export default class MatrixConfigurator {
 
   onBlockTypeAdded () {
 
+    console.log('block type added')
+
   }
 
   onBlockTypeRemoved () {
@@ -73,7 +79,7 @@ export default class MatrixConfigurator {
 
     const toggleFields = this.getToggleFieldsForField(field);
     const conditionals = this.getConditionalsForField(field);
-    
+
     // Create the builder
     const builder = new Builder({
       fieldId: field.id,
@@ -102,7 +108,7 @@ export default class MatrixConfigurator {
 
     - A field's type changes
     - A field's handle changes (or, not neccessary actually)
-    - 
+    -
 
   */
 

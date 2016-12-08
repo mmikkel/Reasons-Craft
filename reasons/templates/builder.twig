@@ -1,0 +1,33 @@
+<div class="reasonsBuilderUi">
+  <div class="wrapper">
+    <div class="heading"><span>{{ 'Show this field if'|t }}</span></div>
+    <div class="reasonsBuilder">
+      <div class="reasonsStatement">
+        <span class="delimiter">{{ 'or'|t }}</span>
+        <div class="reasonsRules">
+          <div class="reasonsRule">
+            <div class="reasonsRuleParams">
+              <div class="select reasonsRuleToggleField"><select /></div>
+              <div class="select reasonsRuleCompare">
+                <select>
+                  <option value="==">{{ 'is equal to'|t }}</option>
+                  <option value="!=">{{ 'is not equal to'|t }}</option>
+                </select>
+              </div>
+              <div class="reasonsRuleValue" />
+            </div>
+            <div class="reasonsRuleAmend">
+              <a class="delete icon reasonsRemoveRule" title="{{ 'Remove rule'|t }}"></a>
+              <a class="add icon reasonsAddRule" title="{{ 'and'|t }}"></a>
+            </div>
+            <span class="reasonsRuleLead">{{ 'and'|t }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reasonsAdd">
+      <a class="btn reasonsAddStatement">{{ 'Add rules'|t }}</a>
+    </div>
+  </div>
+  <div class="reasonsMessage"></div>
+</div>

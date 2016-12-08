@@ -190,61 +190,12 @@ class ReasonsPlugin extends BasePlugin
 
         switch ($actionSegment) {
 
-            case 'switchEntryType' :
-
+            case 'switchEntryType':
                 craft()->templates->includeJs('Craft.ReasonsPlugin.initPrimaryForm();');
-
                 break;
 
-            case 'getEditorHtml' :
-
-                $elementId = (int)craft()->request->getPost('elementId');
-                $element = $elementId ? craft()->elements->getElementById($elementId) : null;
-                $elementType = $element ? $element->elementType : craft()->request->getPost('elementType');
-                $attributes = craft()->request->getPost('attributes');
-
-                $context = null;
-
-                switch ($elementType) {
-
-                    case ElementType::Entry :
-                        if ($element) {
-                            $context = 'entryType:' . $element->type->id;
-                        } else if (isset($attributes['typeId'])) {
-                            $context = 'entryType:' . $attributes['typeId'];
-                        } else if (isset($attributes['sectionId'])) {
-                            $entryTypes = craft()->sections->getEntryTypesBySectionId((int)$attributes['sectionId']);
-                            $entryType = $entryTypes ? array_shift($entryTypes) : false;
-                            $context = $entryType ? 'entryType:' . $entryType->id : null;
-                        }
-                        break;
-
-                    case ElementType::GlobalSet :
-                        $context = $element ? 'globalSet:' . $element->id : null;
-                        break;
-
-                    case ElementType::Asset :
-                        $context = $element ? 'assetSource:' . $element->source->id : null;
-                        break;
-
-                    case ElementType::Category :
-                        $context = $element ? 'categoryGroup:' . $element->group->id : null;
-                        break;
-
-                    case ElementType::Tag :
-                        $context = $element ? 'tagGroup:' . $element->group->id : null;
-                        break;
-
-                    case ElementType::User :
-                        $context = 'users';
-                        break;
-
-                }
-
-                if ($context) {
-                    craft()->templates->includeJs('Craft.ReasonsPlugin.initElementEditor("'.$context.'");');
-                }
-
+            case 'getEditorHtml':
+                craft()->runController('reasons/getEditorHtml');
                 break;
 
         }
@@ -256,12 +207,7 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function includeResources()
     {
-        // $cssFile = 'stylesheets/reasons.css';
-        // $jsFile = 'javascripts/reasons.js';
-        // $manifest = $this->getRevisionManifest();
-        // craft()->templates->includeCssResource('reasons/' . ($manifest ? $manifest->$cssFile : $cssFile));
-        // craft()->templates->includeJsResource('reasons/' . ($manifest ? $manifest->$jsFile : $jsFile));
-        craft()->templates->includeJsResource('reasons/reasons.js');
+        craft()->templates->includeJsResource('reasons/'.$this->getRevvedResource('reasons.js'));
     }
 
     /**
@@ -486,6 +432,12 @@ class ReasonsPlugin extends BasePlugin
         return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? json_decode($manifest) : false;
     }
 
+    protected function getRevvedResource($src)
+    {
+      $manifest = $this->getRevisionManifest();
+      return $manifest[$src] ?: $src;
+    }
+
     /**
      * @return string
      */
@@ -503,7 +455,6 @@ class ReasonsPlugin extends BasePlugin
      */
     public function onSaveFieldLayout(Event $e)
     {
-        ReasonsPlugin::log('Saving a field layout yo!');
         $conditionals = craft()->request->getPost('_reasonsPlugin');
         if ($conditionals) {
             $fieldLayout = $e->params['layout'];
