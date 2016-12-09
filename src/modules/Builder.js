@@ -1,6 +1,7 @@
 import each from 'lodash/each'
 import find from 'lodash/find'
 import reduce from 'lodash/reduce'
+import capitalize from 'lodash/capitalize'
 import objectAssign from 'object-assign'
 
 import Reasons from 'reasons'
@@ -94,7 +95,7 @@ export default class Builder {
   setToggleFields (fields) {
 
     if (!fields) {
-        return false;
+      return false;
     }
 
     let toggleFieldSelectOptions = ''
@@ -102,6 +103,7 @@ export default class Builder {
     this.settings.toggleFields = reduce(fields, (toggleFields, toggleField) => {
       if (toggleField.id != this.fieldId) {
         toggleFieldSelectOptions += Builder.templates.toggleSelectOption(toggleField)
+        toggleField.id = toggleField.id.toString()
         toggleFields.push(toggleField)
       }
       return toggleFields
@@ -343,7 +345,7 @@ export default class Builder {
         var option
         for (var i = 0; i < values.length; ++i) {
           option = {}
-          option[values[ i ]] = values[ i ].charAt(0).toUpperCase() + values[ i ].slice(1)
+          option[values[i]] = Craft.t(capitalize(values[i]))
           options.push(option)
         }
         ruleValueContent = Builder.templates.select(options)
@@ -381,7 +383,7 @@ export default class Builder {
   }
 
   static templates = {
-    select: function(options,isMultiSelect) {
+    select: function(options, isMultiSelect) {
       var selectOptions = []
       var option
       var value
@@ -406,7 +408,7 @@ export default class Builder {
         initialRows: 4,
         placeholder: '',
         multiline: false
-      }, settings)
+      }, settings || {})
       if (settings.multiline === '1'){
         input += '<textarea rows="' + settings.initialRows + '" placeholder="' + settings.placeholder + '" autocomplete="off"></textarea>'
       } else {
@@ -429,6 +431,9 @@ export default class Builder {
                                                 '<select>' +
                                                     '<option value="==">' + Craft.t('is equal to') + '</option>' +
                                                     '<option value="!=">' + Craft.t('is not equal to') + '</option>' +
+                                                    // TODO: Enable these for Number fields
+                                                    // '<option value=">">' + Craft.t('is larger than') + '</option>' +
+                                                    // '<option value="<">' + Craft.t('is smaller than') + '</option>' +
                                                 '</select>' +
                                             '</div>' +
                                             '<div class="reasonsRuleValue" />' +

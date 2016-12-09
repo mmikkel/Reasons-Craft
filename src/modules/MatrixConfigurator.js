@@ -1,7 +1,10 @@
+import reduce from 'lodash/reduce'
+import objectAssign from 'object-assign'
+
 import Reasons from 'reasons'
 import Builder from 'modules/Builder'
 
-import { OPTION_BASED_FIELDTYPES } from 'core/settings'
+//import { OPTION_BASED_FIELDTYPES } from 'core/settings'
 
 export default class MatrixConfigurator {
 
@@ -22,8 +25,6 @@ export default class MatrixConfigurator {
 
     this.configurator = configurator;
 
-    console.log('matrix configurator init')
-
     // Init existing block types
     for (var id in this.configurator.blockTypes) {
       this.initBlockType(this.configurator.blockTypes[id])
@@ -39,14 +40,19 @@ export default class MatrixConfigurator {
 
   initBlockType (blockType) {
 
-    console.log('init block type')
+    const toggleFields = this.getToggleFieldsForBlockType(blockType)
 
-    // Sneaky.
-    blockType._reasons = {
-      $input: $('<input type="hidden" name="types[Matrix][blockTypes]['+blockType.id+'][_reasonsPlugin]" value="" />').appendTo(blockType.$item)
+    if (!blockType._reasons) {
+      blockType._reasons = {
+        // TODO: The input will store all conditionals for this block type
+        $input: $('<input type="hidden" name="types[Matrix][blockTypes]['+blockType.id+'][_reasonsPlugin]" value="" />').appendTo(blockType.$item),
+        toggleFields
+      }
+    } else {
+      blockType._reasons = objectAssign({}, blockType._reasons, { toggleFields })
     }
 
-    // Init fields
+    // Init fields in block type
     for (var id in blockType.fields) {
       this.initField(blockType.fields[id])
     }
@@ -55,128 +61,220 @@ export default class MatrixConfigurator {
 
   }
 
-  destroyBlockType () {
-
-  }
-
-  updateBlockType () {
-
+  destroyBlockType (blockType) {
+    if (blockType._reasons) {
+      delete blockType._reasons
+    }
   }
 
   onBlockTypeAdded () {
-
-    console.log('block type added')
-
+    // TODO
   }
 
   onBlockTypeRemoved () {
-
+    // TODO
   }
 
   initField (field) {
 
-    console.log(field, field.id);
+    const toggleFields = this.getToggleFieldsForField(field)
 
-    const toggleFields = this.getToggleFieldsForField(field);
-    const conditionals = this.getConditionalsForField(field);
+    if (!field._reasons) {
 
-    // Create the builder
-    const builder = new Builder({
-      fieldId: field.id,
-      toggleFields: toggleFields,
-      rules: conditionals,
-      onChange: this.onConditionalsBuilderChange.bind(field)
-    });
+      field._reasons = {
+        builder: new Builder({
+          fieldId: field.id,
+          onChange: this.onConditionalsChange.bind(this, field),
+          conditionals: this.getConditionalsForField(field),
+          toggleFields
+        })
+      }
 
-    field.$fieldSettingsContainer.children('a.delete:last').before($('<div><hr /></div>').prepend(builder.get()));
+      field.$fieldSettingsContainer
+        .on('change', ':input', this.onFieldSettingsChange.bind(this, field))
+        .children('a.delete:last').before($('<div><hr /></div>').prepend(field._reasons.builder.get()));
 
-    // Again, sneaky.
-    field._reasons = {
-      builder
+      this.onConditionalsChange(field)
+
+    } else {
+      field._reasons.builder.update({
+        toggleFields
+      })
     }
 
   }
 
   destroyField () {
-
+    if (field._reasons) {
+      field._reasons.builder.destroy()
+      delete field._reasons
+    }
   }
 
-  // Whenever a field's type changes, we'll need to re-evaluate the whole block type
-
-  /*
-    Re-eval block if
-
-    - A field's type changes
-    - A field's handle changes (or, not neccessary actually)
-    -
-
-  */
-
-  onFieldTypeChange (e) {
-
-    // const $target = $(e.currentTarget);
-    // const $field = $target.closest('[data-id]');
-    // const $block = $field.parent();
-
-    // console.log('update block', $block.data('id'));
-
+  onFieldSettingsChange (field) {
+    Garnish.requestAnimationFrame(() => {
+      this.initBlockType(field.blockType)
+    })
   }
 
   onFieldAdded () {
-
+    // TODO
   }
 
   onFieldRemoved () {
-
+    // TODO
   }
 
-  onConditionalsBuilderChange () {
-    // Add/remove js-reasons-has-conditionals className for field
-    // if builder.getConditionals()
+  onConditionalsChange (field) {
+    if (!field._reasons) return false
+    const builder = field._reasons.builder
+    const $el = field.$item
+    if (builder.getConditionals()) {
+      $el.addClass('js-reasons-has-conditionals')
+    } else {
+      $el.removeClass('js-reasons-has-conditionals')
+    }
   }
 
   /*
   * Convenience methods
   *
   */
+  getToggleFieldsForBlockType (blockType) {
+    return reduce(blockType.fields, (toggleFields, field) => {
+      let toggleFieldData = this.getToggleFieldDataFromField(field)
+      if (toggleFieldData) toggleFields.push(toggleFieldData)
+      return toggleFields
+    }, [])
+  }
 
   getToggleFieldsForField (field) {
-    const toggleFieldTypes = Reasons.getToggleFieldTypes();
-    const blockType = field.blockType;
-    let toggleFields = [];
-    let siblingField;
-    for (var id in blockType.fields) {
-      siblingField = blockType.fields[id];
-      if (siblingField.id === field.id) continue;
-      if (toggleFieldTypes.indexOf(siblingField.selectedFieldType) > -1) {
-        toggleFields.push(this.getToggleFieldDataFromField(siblingField));
-      }
-    }
-    return toggleFields;
+    return reduce(field.blockType._reasons.toggleFields, (toggleFields, toggleField) => {
+      if (toggleField.id != field.id) toggleFields.push(toggleField)
+      return toggleFields
+    }, [])
+  }
+
+  isToggleField (field) {
+    const toggleFieldTypes = Reasons.getToggleFieldTypes()
+    return toggleFieldTypes.indexOf(field.selectedFieldType||'') > -1
   }
 
   getToggleFieldDataFromField (field) {
-    const fieldType = field.selectedFieldType;
 
-    let settings = null;
-    return {
-      id: field.id,
-      handle: field.$handleInput.val(),
-      name: field.$nameInput.val(),
-      type: fieldType,
-      contentAttribute: null,
-      settings: this.getToggleFieldSettingsFromField(field)
-    };
+    if (!this.isToggleField(field)) return null
+
+    const id = field.id
+    const name = field.$nameInput.val()
+    const handle = field.$handleInput.val()
+    const type = field.selectedFieldType
+    const settings = this.getToggleFieldSettingsFromField(field)
+
+    return id && name && handle && type && settings ? {
+      id, name, handle, type,
+      settings: settings !== true ? settings : null
+    } : null
+
   }
 
   getToggleFieldSettingsFromField (field) {
-    if (field.selectedFieldType === 'Dropdown') {
-      //console.log
+
+    const fieldType = field.selectedFieldType
+    const $settingsContainer = $(field.initializedFieldTypeSettings[fieldType])
+
+    if (!$settingsContainer || !$settingsContainer.length) return null
+
+    switch (fieldType) {
+
+      // Lightswitch
+      case 'Lightswitch':
+        return true
+        break;
+
+      // Number
+      case 'Number':
+
+        var options = {
+          min: $settingsContainer.find('input[name$="[min]"]').val(),
+          max: $settingsContainer.find('input[name$="[max]"]').val(),
+          decimals: $settingsContainer.find('input[name$="[decimals]"]').val(),
+        }
+        return { options }
+
+      // Plain text fields
+      case 'PlainText':
+      case 'PreparseField_Preparse':
+
+        var options = {
+          multiline: $settingsContainer.find('input[name$="[multiline]"]').val() == 1,
+          initialRows: $settingsContainer.find('input[name$="[initialRows]"]').val()
+        }
+        return { options }
+
+      // Option based fields
+      case 'Dropdown':
+      case 'Checkboxes':
+      case 'MultiSelect':
+      case 'RadioButtons':
+      // case 'ButtonBox_Buttons':
+      // case 'ButtonBox_Colours':
+      // case 'ButtonBox_TextSize':
+      // case 'ButtonBox_Width':
+
+        var $settings = $settingsContainer.find('table:first tr')
+        var options = reduce($settings, (options, option) => {
+          option = $(option)
+          var value = option.find(':input[name$="[value]"]').val()
+          var label = option.find(':input[name$="[label]"]').val()
+          if (value && value.length && label && label.length) {
+            options.push({ label, value })
+          }
+          return options
+        }, [])
+
+        return options.length ? { options } : null
+
+      // Position select
+      case 'PositionSelect':
+
+        var $settings = $settingsContainer.find('table:first tr')
+        var options = reduce($settings, (options, option) => {
+          var $input = $(option).find('input[type="hidden"]:first')
+          var value = $input.attr('name').split('[').pop().replace(']', '')
+          var enabled = $input.val() == 1
+          if (enabled && value && value.length) {
+            options.push(value)
+          }
+          return options
+        }, [])
+
+        return options.length ? { options } : null
+
+        break;
+
+      // Relational fields
+      case 'Entries':
+      case 'Categories':
+      case 'Tags':
+      case 'Assets':
+      case 'Users':
+      case 'Calendar_Event':
+        return true
+
+      // Custom fields
+      case 'ButtonBox_Stars':
+        // TODO
+        break;
+
+
     }
+
     return null;
+
   }
 
   getConditionalsForField () {
+    // TODO
     return null;
   }
 
