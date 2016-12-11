@@ -11,16 +11,16 @@ import BuilderModal from './BuilderModal'
 
 export default class FieldLayoutDesigner {
 
-  constructor (fldClass) {
+  constructor (coreClass) {
 
-    const fn = fldClass.prototype
-    const fnFieldDrag = fldClass.FieldDrag.prototype
+    const fn = coreClass.prototype
+    const fnFieldDrag = coreClass.FieldDrag.prototype
     const self = this
 
     const fnInit = fn.init
     fn.init = function () {
       fnInit.apply(this, arguments)
-      self.init(this)
+      self.afterInit(this)
     }
 
     const fnInitField = fn.initField
@@ -59,7 +59,7 @@ export default class FieldLayoutDesigner {
 
   }
 
-  init (fld) {
+  afterInit (fld) {
 
     const formAttributes = Reasons.getFormAttributes()
 

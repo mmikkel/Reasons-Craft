@@ -62,7 +62,11 @@ class ReasonsService extends BaseApplicationComponent
                 }
                 throw $e;
             }
+
+            craft()->fileCache->delete($this->getPlugin()->getCacheKey());
+
             return true;
+
         }
 
         return false;
@@ -100,17 +104,16 @@ class ReasonsService extends BaseApplicationComponent
 
           if ($blockTypeHandle && $blockType->handle === $blockTypeHandle || !$blockTypeHandle && $blockType->id === $blockTypeId) {
 
-            // Got it!
-            $fieldLayoutId = $blockType->fieldLayoutId;
-            $blockTypeFields = $blockType->getFields();
-
             // This next one is a bit tricky... we'll need to rewrite any "new" field IDs by using their handle as identification
-            // This is essentially the reverse of what happens in the JS, but worse, because I suck at PHP LOL
+            // This is essentially the reverse of what happens in the JS, but less elegant, because I suck at PHP LOL
             $conditionals = JsonHelper::decode($conditionals);
             $conditionalsToSave = array();
 
-            // var_dump($conditionals);
-            // die();
+            if (!$conditionals || !is_array($conditionals)) {
+              continue;
+            }
+
+            $blockTypeFields = $blockType->getFields();
 
             foreach ($conditionals as $fieldId => $statements) {
 
@@ -179,11 +182,15 @@ class ReasonsService extends BaseApplicationComponent
 
             // Create conditionals model
             $model = new Reasons_ConditionalsModel();
-            $model->fieldLayoutId = $fieldLayoutId;
+            $model->fieldLayoutId = $blockType->fieldLayoutId;
             $model->conditionals = $conditionalsToSave;
 
             // Save it
-            craft()->reasons->saveConditionals($model);
+            $success = craft()->reasons->saveConditionals($model);
+
+            if ($success) {
+              craft()->fileCache->delete($this->getPlugin()->getCacheKey());
+            }
 
           }
         }

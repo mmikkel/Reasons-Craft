@@ -6,9 +6,10 @@ import * as constants from 'core/constants'
 
 import FieldLayoutDesigner from 'modules/FieldLayoutDesigner'
 import MatrixConfigurator from 'modules/MatrixConfigurator'
+import MatrixInput from 'modules/MatrixInput'
 import ElementEditor from 'modules/ElementEditor'
-import EditForm from 'modules/EditForm'
-//import MatrixParser from 'modules/MatrixParser'
+import Parser from 'modules/Parser'
+
 
 import 'styles/reasons.scss'
 import 'lib/jquery-extensions'
@@ -21,7 +22,7 @@ export default class Reasons {
 
     Reasons.data = data;
 
-    const hijackClasses = { FieldLayoutDesigner, MatrixConfigurator, ElementEditor }
+    const hijackClasses = { FieldLayoutDesigner, MatrixConfigurator, MatrixInput, ElementEditor }
     for (var className in hijackClasses) {
       const _class = hijackClasses[className]
       const craftClass = Craft[className] || null
@@ -33,7 +34,10 @@ export default class Reasons {
 
     $(this.initPrimaryForm.bind(this))
 
-    if (Reasons.data.debug) console.info('Reasons v. '+this.getVersion()+' initialized')
+    if (Reasons.data.debug) {
+      console.info('Reasons v. '+this.getVersion()+' initialized')
+      console.info('Reasons data', Reasons.data)
+    }
 
   }
 
@@ -49,15 +53,15 @@ export default class Reasons {
 
     if (formAttributes.context === constants.FORM_PARSER_CONTEXT && formAttributes.conditionals) {
       const $form = Reasons.getPrimaryForm()
-      this.editForm = new EditForm($form, formAttributes.conditionals)
+      this.parser = new Parser($form, formAttributes.conditionals)
     }
 
   }
 
   destroyPrimaryForm () {
-    if (this.editForm) {
-      this.editForm.destroy()
-      delete this.editForm
+    if (this.parser) {
+      this.parser.destroy()
+      delete this.parser
     }
   }
 
@@ -102,13 +106,14 @@ export default class Reasons {
     return false
   }
 
-  static getFieldIds () {
-    return Reasons.data.fieldIds ? Reasons.data.fieldIds : {}
+  static getFieldIds (context) {
+    context = context || 'global'
+    return Reasons.data.fieldIds && Reasons.data.fieldIds[context] ? Reasons.data.fieldIds[context] : {}
   }
 
-  static getFieldIdByHandle (fieldHandle) {
-    const fieldIds = Reasons.getFieldIds()
-    return fieldIds && fieldIds.hasOwnProperty(fieldHandle) ? fieldIds[fieldHandle] : false
+  static getFieldIdByHandle (fieldHandle, context) {
+    const fieldIds = Reasons.getFieldIds(context)
+    return fieldIds && fieldIds[fieldHandle] ? fieldIds[fieldHandle] : false
   }
 
   static getToggleFieldTypes () {

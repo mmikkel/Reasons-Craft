@@ -3,25 +3,24 @@ import * as _ from 'lib/lodash'
 import Reasons from 'reasons'
 import Builder from 'modules/Builder'
 
-// TODO: Add a warning when deleting fields or changing field type, if that field is a toggle field for conditionals
 // TODO: Handle errors on save! Put the conditionals in localStorage
 
 export default class MatrixConfigurator {
 
-  constructor (matrixClass) {
+  constructor (coreClass) {
 
     const self = this
-    const fn = matrixClass.prototype
+    const fn = coreClass.prototype
 
     const fnInit = fn.init
     fn.init = function () {
       fnInit.apply(this, arguments)
-      self.init(this)
+      self.afterInit(this)
     }
 
   }
 
-  init (configurator) {
+  afterInit (configurator) {
 
     this.configurator = configurator;
 
@@ -357,24 +356,38 @@ export default class MatrixConfigurator {
 
     const fieldId = field.id.toString()
 
-    // Get conditionals without the ones for the field we're working with
-    const blockTypeConditionals = _.omit(blockType._reasons.conditionals || {}, fieldId)
+    let conditionalsToSave = Object.assign({}, blockType._reasons.conditionals || {})
+    conditionalsToSave[fieldId] = conditionals
 
-    // Merge the new conditionals for our current field in (if there are conditionals)
-    if (conditionals) blockTypeConditionals[fieldId] = conditionals
-
-    // Cache the raw conditionals to the field's block type
-    blockType._reasons.conditionals = blockTypeConditionals
-
-    // ...and update the hidden input field
-    this.setConditionalsInput(blockType, blockTypeConditionals)
+    this.setConditionalsForBlockType(blockType, conditionalsToSave)
 
   }
 
-  setConditionalsInput (blockType, conditionals) {
+  setConditionalsForBlockType (blockType, conditionals) {
 
-    // Add field handles to new fields' temporary IDs
-    conditionals = _.reduce(conditionals, (conditionals, statements, fieldId) => {
+    if (!blockType._reasons) return false
+
+    const blockTypeFieldIds = Object.keys(blockType.fields)
+    const blockTypeConditionals = _.reduce(conditionals, (result, value, key) => {
+      key = key.toString()
+      if (value && blockTypeFieldIds.indexOf(key) > -1) result[key] = value
+      return result
+    }, {})
+
+    blockType._reasons = Object.assign(blockType._reasons, {
+      conditionals: blockTypeConditionals
+    })
+
+    this.updateConditionalsInputForBlockType(blockType)
+
+  }
+
+  updateConditionalsInputForBlockType (blockType) {
+
+    if (!blockType._reasons) return false
+
+    // Add field handles to new fields' temporary IDs before serializing
+    const conditionals = _.reduce(blockType._reasons.conditionals || {}, (conditionals, statements, fieldId) => {
       fieldId = this.addHandleToNewFieldId(blockType, fieldId)
       conditionals[fieldId] = _.reduce(statements, (statements, rules) => {
         statements.push(_.reduce(rules, (rules, rule) => {
@@ -390,7 +403,8 @@ export default class MatrixConfigurator {
 
     // Serialize the conditionals and update the hidden input
     const serializedConditionals = Object.keys(conditionals).length ? JSON.stringify(conditionals) : ''
-    blockType._reasons.$input.val(serializedConditionals)
+    const $input = blockType._reasons.$input
+    if ($input.val() !== serializedConditionals) $input.val(serializedConditionals)
 
   }
 

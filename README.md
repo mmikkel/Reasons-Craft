@@ -6,13 +6,15 @@ _Supercharge your field layouts with conditionals._
 
 Reasons for Craft CMS adds conditionals to field layouts, making it possible to hide or show fields based on other fields' values – all while you're typin', selectin' and togglin' away at your content.  
 
-Reasons supports most stock FieldTypes, and works pretty much across the board (yes, even inside Matrix blocks). Craft Commerce is also fully supported.  
+Since 2.0, Reasons works pretty much across the board (yes, even inside Matrix blocks). Craft Commerce is also fully supported.  
 
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
 ## Requirements
 
 **Reasons requires Craft 2.5 or newer. Running Craft 2.4 or below? An older version supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
+
+Upgrading from Reasons 1.x to 2.x? No worries, it's seamless.  
 
 ## Installation
 
@@ -83,8 +85,9 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 * [Added] Support for Matrix
 * [Added] Support for Craft Commerce (including variants)
 * [Added] Support for the Preparse custom FieldType by @aelvan
-* [Added] Ability for custom FieldTypes to add Reasons support
+* [Added] Hook for custom FieldTypes to register themselves as toggle fields
 * [Added] Conditionals can now be added to tabs
+* [Added] Additional, contextual operators added (e.g. "larger than", "contains")
 * [Improved] Conditionals are no longer confined to tabs
 * [Improved] Tabs with no visible fields are hidden
 * [Improved] More or less rewrote the whole thing, for a faster, better experience

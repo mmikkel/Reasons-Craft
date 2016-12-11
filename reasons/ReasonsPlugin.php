@@ -277,7 +277,11 @@ class ReasonsPlugin extends BasePlugin
         if ($matrixBlockTypeRecords) {
             foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
                 $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
-                $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
+                // This looks like a mess (well I guess the whole plugin does :D) but we need to be able to query blocks by both ID and handle so yeah
+                $fieldId = $matrixBlockType->fieldId;
+                $fieldLayoutId = $matrixBlockType->fieldLayoutId;
+                $sources['matrixBlockType:'.$matrixBlockType->id] = $fieldLayoutId;
+                $sources['matrixField:'.$fieldId.':'.$matrixBlockType->handle] = $fieldLayoutId;
             }
         }
 
@@ -399,7 +403,7 @@ class ReasonsPlugin extends BasePlugin
                     'handle' => $field->handle,
                     'name' => $field->name,
                     'type' => $classHandle,
-                    'contentAttribute' => $fieldType->defineContentAttribute() ?: false,
+                    //'contentAttribute' => $fieldType->defineContentAttribute() ?: false,
                     'settings' => $field->settings,
                 );
             }
@@ -412,12 +416,22 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getFieldIds()
     {
-        $handles = array();
-        $fields = craft()->fields->getAllFields();
-        foreach ($fields as $field) {
-            $handles[$field->handle] = $field->id;
+        $fields = array();
+        // Using a custom DB query because that's the only way I figured to include Matrix block type fields
+        $fieldRecords = craft()->db->createCommand()
+                          ->select('id, handle, context')
+                          ->from('fields')
+                          ->queryAll();
+        if ($fieldRecords) {
+          foreach ($fieldRecords as $fieldRecord) {
+            $context = $fieldRecord['context'];
+            if (!isset($fields[$context])) {
+              $fields[$context] = array();
+            }
+            $fields[$context][$fieldRecord['handle']] = $fieldRecord['id'];
+          }
         }
-        return $handles;
+        return $fields;
     }
 
     /**
@@ -438,7 +452,7 @@ class ReasonsPlugin extends BasePlugin
     /**
      * @return string
      */
-    protected function getCacheKey()
+    public function getCacheKey()
     {
         return $this->_pluginName.'_'.$this->_version.'_'.$this->_schemaVersion;
     }

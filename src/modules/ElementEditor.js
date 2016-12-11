@@ -1,12 +1,12 @@
 import Reasons from 'reasons'
-import EditForm from './EditForm'
+import Parser from './Parser'
 
 export default class ElementEditor {
 
-  constructor (elementEditorClass) {
+  constructor (coreClass) {
 
     const self = this
-    const fn = elementEditorClass.prototype
+    const fn = coreClass.prototype
 
     const fnShowHud = fn.showHud
     fn.showHud = function (response) {
@@ -35,7 +35,7 @@ export default class ElementEditor {
 
     if (!conditionals) return false
 
-    this.editForm = new EditForm(elementEditor.$form, conditionals)
+    this.parser = new Parser(elementEditor.$form, conditionals)
     elementEditor.hud.on('hide', this.destroy.bind(this))
 
   }
@@ -46,9 +46,9 @@ export default class ElementEditor {
 
   destroy () {
 
-    if (this.editForm) {
-      this.editForm.destroy()
-      delete this.editForm
+    if (this.parser) {
+      this.parser.destroy()
+      delete this.parser
     }
 
   }
