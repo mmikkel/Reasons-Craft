@@ -35,30 +35,30 @@ class ReasonsController extends BaseController {
 
         case ElementType::Entry :
           if ($element) {
-            $source = 'entryType:' . $element->type->id;
+            $source = 'entryType:'.$element->type->id;
           } else if (isset($attributes['typeId'])) {
-            $source = 'entryType:' . $attributes['typeId'];
+            $source = 'entryType:'.$attributes['typeId'];
           } else if (isset($attributes['sectionId'])) {
             $entryTypes = craft()->sections->getEntryTypesBySectionId((int)$attributes['sectionId']);
             $entryType = $entryTypes ? array_shift($entryTypes) : false;
-            $source = $entryType ? 'entryType:' . $entryType->id : null;
+            $source = $entryType ? 'entryType:'.$entryType->id : null;
           }
           break;
 
         case ElementType::GlobalSet :
-          $source = $element ? 'globalSet:' . $element->id : null;
+          $source = $element ? 'globalSet:'.$element->id : null;
           break;
 
         case ElementType::Asset :
-          $source = $element ? 'assetSource:' . $element->source->id : null;
+          $source = $element ? 'assetSource:'.$element->source->id : null;
           break;
 
         case ElementType::Category :
-          $source = $element ? 'categoryGroup:' . $element->group->id : null;
+          $source = $element ? 'categoryGroup:'.$element->group->id : null;
           break;
 
         case ElementType::Tag :
-          $source = $element ? 'tagGroup:' . $element->group->id : null;
+          $source = $element ? 'tagGroup:'.$element->group->id : null;
           break;
 
         case ElementType::User :

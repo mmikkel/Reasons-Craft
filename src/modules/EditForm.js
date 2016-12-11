@@ -1,7 +1,6 @@
-import objectAssign from 'object-assign'
-
 import Reasons from 'reasons'
-import parse from './parser'
+
+// Performance issue w/ Lightswitches?
 
 export default class EditForm {
 
@@ -10,7 +9,8 @@ export default class EditForm {
     livePreviewEditorSelector: '.lp-editor',
     elementEditorSelector: '.elementeditor',
     lightswitchContainerSelector: '.lightswitch',
-    positionSelectContainerSelector: '.btngroup'
+    positionSelectContainerSelector: '.btngroup',
+    tabsNavSelector: 'nav#tabs li'
   }
 
   constructor ($el, conditionals, settings) {
@@ -22,11 +22,16 @@ export default class EditForm {
     this.$el = $el
 
     if (this.$el.data('reasonsinit')) return false
+    this.$el.data('reasonsinit', true)
 
-    this.$el.attr('[data-reasonsinit]')
+    const $tabs = this.$el.find('nav#tabs .tab')
 
     this.conditionals = conditionals
-    this.settings = objectAssign({}, EditForm.settings, settings || {})
+    this.settings = Object.assign({}, EditForm.settings, {
+      hasTabs: $tabs.length > 1
+    }, settings || {})
+
+    this.$tabs = this.settings.hasTabs ? $tabs : null
 
     this.id = this.$el.attr('id')
 
@@ -135,6 +140,7 @@ export default class EditForm {
   destroy() {
     this.removeEventListeners();
     this.removeLivePreviewListeners();
+    this.$el.data('reasonsinit', false)
   }
 
   render() {
@@ -183,31 +189,35 @@ export default class EditForm {
 
     this.$fields.each(function () {
 
-      $field = $(this);
+      $field = $(this)
 
-      if ($field.attr('id') === undefined) return;
+      if ($field.attr('id') === undefined) return
 
       // Get field handle
-      fieldHandlePath = $field.attr('id').split('-');
+      fieldHandlePath = $field.attr('id').split('-')
 
-      if (fieldHandlePath.length < 3 || fieldHandlePath.length > 4) return; // Only basic fields for now!
-      fieldHandle = fieldHandlePath.slice(-2, -1)[0] || false;
+      if (fieldHandlePath.length < 3 || fieldHandlePath.length > 4) return // Only basic fields for now!
+      fieldHandle = fieldHandlePath.slice(-2, -1)[0] || false
 
-      if (!fieldHandle) return;
-      fieldId = Reasons.getFieldIdByHandle(fieldHandle);
+      if (!fieldHandle) return
+      fieldId = Reasons.getFieldIdByHandle(fieldHandle)
+
+      if (!fieldId) return
+
+      fieldId = fieldId.toString()
 
       if (fieldId){
-        $field.attr('data-id', fieldId);
+        $field.attr('data-id', fieldId)
       }
 
       // Is this a target field?
       if (self.conditionals[fieldId]){
-          $field.attr('data-target', 1);
+        $field.attr('data-target', 1);
       }
 
       // Is this a toggle field
-      if (toggleFieldIds.indexOf(parseInt(fieldId)) > -1){
-          $field.attr('data-toggle', 1);
+      if (toggleFieldIds.indexOf(fieldId) > -1){
+        $field.attr('data-toggle', 1);
       }
 
     });
@@ -229,6 +239,13 @@ export default class EditForm {
           $toggleFieldInput,
           toggleFieldData,
           toggleFieldValue;
+
+      if (this.settings.hasTabs) {
+        this.$el.find(this.settings.tabsNavSelector)
+          .removeClass('reasonsHide')
+          .removeAttr('aria-hidden')
+          .removeAttr('tabindex')
+      }
 
       $targetFields
           .removeClass('reasonsHide')
@@ -321,10 +338,23 @@ export default class EditForm {
               }
 
               if (numValidStatements <= 0){
-                  $targetField
-                      .addClass('reasonsHide')
-                      .attr('aria-hidden', 'true')
-                      .attr('tabindex', '-1');
+                // Hide this field
+                $targetField
+                  .addClass('reasonsHide')
+                  .attr('aria-hidden', 'true')
+                  .attr('tabindex', '-1');
+                // Also hide tab?
+                const $tab = self.settings.hasTabs ? $targetField.closest('div[id^="tab"]') : null
+                if ($tab && $tab.length) {
+                  const tabIndex = $tab.index()
+                  const currentTabIndex = self.$tabs.filter(':not(.hidden)').index()
+                  if (tabIndex > 0 && tabIndex !== currentTabIndex) { // Never hide the first tab, or the current tab
+                    const $visibleFieldsInTab = $tab.find(self.settings.fieldsSelector+':not(.reasonsHide)')
+                    if (!$visibleFieldsInTab.length) {
+                      self.$el.find(self.settings.tabsNavSelector+':nth('+(tabIndex)+')').addClass('reasonsHide')
+                    }
+                  }
+                }
               }
 
       });

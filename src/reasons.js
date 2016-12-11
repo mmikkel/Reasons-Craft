@@ -1,9 +1,6 @@
-import Craft from 'craft';
+import 'babel-polyfill'
 
-import each from 'lodash/each'
-
-import 'styles/reasons.scss'
-import 'lib/jquery-extensions'
+import each from 'lib/lodash'
 
 import * as constants from 'core/constants'
 
@@ -12,6 +9,9 @@ import MatrixConfigurator from 'modules/MatrixConfigurator'
 import ElementEditor from 'modules/ElementEditor'
 import EditForm from 'modules/EditForm'
 //import MatrixParser from 'modules/MatrixParser'
+
+import 'styles/reasons.scss'
+import 'lib/jquery-extensions'
 
 export default class Reasons {
 
@@ -33,6 +33,12 @@ export default class Reasons {
 
     $(this.initPrimaryForm.bind(this))
 
+    if (Reasons.data.debug) console.info('Reasons v. '+this.getVersion()+' initialized')
+
+  }
+
+  getVersion () {
+    return Reasons.data ? Reasons.data.version || '' : ''
   }
 
   initPrimaryForm () {
@@ -110,8 +116,6 @@ export default class Reasons {
   }
 
   static getFormAttributes ($form) {
-
-    console.log('get form attributes', $form)
 
     if (!$form || !$form.length) {
       $form = Reasons.getPrimaryForm()

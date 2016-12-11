@@ -1,9 +1,13 @@
-import reduce from 'lodash/reduce'
-import each from 'lodash/each'
+import { reduce, each } from 'lib/lodash'
 
 import Reasons from 'reasons'
 import Builder from './Builder'
 import BuilderModal from './BuilderModal'
+
+// TODO: Add a warning if deleting a field, if that field is a toggle field for a condtional
+// TODO: Finish disabling required fields (just need an event handler for when a field is made required)
+
+// TODO: Add conditionals to tab!
 
 export default class FieldLayoutDesigner {
 
@@ -62,7 +66,7 @@ export default class FieldLayoutDesigner {
     if (!formAttributes) return false
 
     this.fld = fld
-    this.$input = $('<input type="hidden" name="_reasonsPlugin" value="" />').appendTo(this.fld.$container)
+    this.$input = $('<input type="hidden" name="_reasonsConditionals" value="" />').appendTo(this.fld.$container)
 
     this.setConditionals(formAttributes.conditionals)
     this.update()
@@ -111,19 +115,22 @@ export default class FieldLayoutDesigner {
 
         const $field = $(field)
         const fieldId = $field.data('id')
+        const fieldRequired = $field.hasClass('fld-required')
 
         let builder = $field.data('_reasonsPlugin')
 
         if (builder) {
           // Update field builder
           builder.update({
-            toggleFields
+            toggleFields,
+            fieldRequired
           })
         } else {
           // Create new builder
           builder = new Builder({
             fieldId,
             toggleFields,
+            fieldRequired,
             conditionals: this.getConditionalsForField(fieldId)
           })
         }

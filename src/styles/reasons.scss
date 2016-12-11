@@ -1,4 +1,5 @@
-.field.reasonsHide {
+.field.reasonsHide,
+.tabs li.reasonsHide {
 	height: 0 !important;
     visibility: hidden !important;
     overflow: hidden !important;
@@ -13,8 +14,9 @@
 }
 
 .reasonsBuilderUi .heading {
-    margin-bottom: 20px;
-    font-weight: bold;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #576575;
 }
 
 .reasonsBuilderUi.disabled {
@@ -132,8 +134,22 @@
     }
 
     .matrixconfigitem.js-reasons-has-conditionals {
-      border: 1px dashed rgba(black, .25);
-      opacity: .75;
+      &::before {
+        content: "";
+        width: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 5px;
+        background: repeating-linear-gradient(
+          -55deg,
+          transparent,
+          transparent 10px,
+          #9198A2 10px,
+          #9198A2 20px
+        );
+        pointer-events: none;
+      }
     }
 
 }

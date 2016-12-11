@@ -142,32 +142,27 @@ class ReasonsPlugin extends BasePlugin
     public function init()
     {
 
-        parent::init();
+      parent::init();
 
-        if (!craft()->request->isCpRequest() || craft()->isConsole()) {
-            return false;
-        }
+      if (!craft()->request->isCpRequest() || craft()->isConsole()) {
+          return false;
+      }
 
-        if (!$this->isCraftRequiredVersion()) {
-            craft()->userSession->setError(Craft::t('Reasons requires Craft 2.5 or newer, and has been disabled.'));
-            return false;
-        }
+      if (!$this->isCraftRequiredVersion()) {
+          craft()->userSession->setError(Craft::t('Reasons requires Craft 2.5 or newer, and has been disabled.'));
+          return false;
+      }
 
-        if (craft()->request->isAjaxRequest()) {
+      //Craft::import('plugins.reasons.helpers.ReasonsHelper');
 
-            $this->ajaxInit();
+      craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
 
-        } else {
-
-            $this->includeResources();
-
-            $data = $this->getData();
-
-            craft()->templates->includeJs('Craft.ReasonsPlugin.init('.$data.');');
-
-            craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
-
-        }
+      if (craft()->request->isActionRequest()) {
+        $this->actionRequestInit();
+      } else if (!craft()->request->isAjaxRequest()) {
+        $this->includeResources();
+        craft()->templates->includeJs('Craft.ReasonsPlugin.init('.$this->getData().');');
+      }
 
     }
 
@@ -178,27 +173,27 @@ class ReasonsPlugin extends BasePlugin
     /**
      * @return bool
      */
-    protected function ajaxInit()
+    protected function actionRequestInit()
     {
 
-        if (!craft()->request->isPostRequest()) {
-            return false;
-        }
+      if (!craft()->request->isActionRequest()) {
+        return false;
+      }
 
-        $segments = craft()->request->segments;
-        $actionSegment = is_array($segments) && !empty($segments) ? $segments[count($segments) - 1] : null;
+      $actionPath = implode('/', craft()->request->getActionSegments());
 
-        switch ($actionSegment) {
+      switch ($actionPath) {
+        case 'fields/saveField':
+          craft()->runController('reasons/fields/saveField');
+          break;
+        case 'elements/getEditorHtml':
+          craft()->runController('reasons/getEditorHtml');
+          break;
+        case 'entries/switchEntryType':
+          craft()->templates->includeJs('Craft.ReasonsPlugin.initPrimaryForm();');
+          break;
 
-            case 'switchEntryType':
-                craft()->templates->includeJs('Craft.ReasonsPlugin.initPrimaryForm();');
-                break;
-
-            case 'getEditorHtml':
-                craft()->runController('reasons/getEditorHtml');
-                break;
-
-        }
+      }
 
     }
 
@@ -220,6 +215,8 @@ class ReasonsPlugin extends BasePlugin
         $data = $doCacheData ? craft()->fileCache->get($cacheKey) : null;
         if (!$data) {
             $data = array(
+                'version' => $this->getVersion(),
+                'debug' => craft()->config->get('devMode'),
                 'conditionals' => $this->getConditionals(),
                 'toggleFieldTypes' => $this->getToggleFieldTypes(),
                 'toggleFields' => $this->getToggleFields(),
@@ -229,7 +226,7 @@ class ReasonsPlugin extends BasePlugin
                 craft()->fileCache->set($this->getCacheKey(), $data, 1800); // Cache for 30 minutes
             }
         }
-        return json_encode($data);
+        return JsonHelper::encode($data);
     }
 
     /**
@@ -275,14 +272,14 @@ class ReasonsPlugin extends BasePlugin
             $sources['globalSet:' . $globalSet->id] = $globalSet->fieldLayoutId;
         }
 
-        // Matrix blocks – TODO
-        // $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
-        // if ($matrixBlockTypeRecords) {
-        //     foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
-        //         $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
-        //         $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
-        //     }
-        // }
+        // Matrix block types
+        $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
+        if ($matrixBlockTypeRecords) {
+            foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
+                $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
+                $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
+            }
+        }
 
         // Users
         $usersFieldLayout = craft()->fields->getLayoutByType(ElementType::User);
@@ -429,7 +426,7 @@ class ReasonsPlugin extends BasePlugin
     protected function getRevisionManifest()
     {
         $manifestPath = craft()->path->getPluginsPath().'/reasons/resources/rev-manifest.json';
-        return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? json_decode($manifest) : false;
+        return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? JsonHelper::decode($manifest) : false;
     }
 
     protected function getRevvedResource($src)
@@ -455,15 +452,27 @@ class ReasonsPlugin extends BasePlugin
      */
     public function onSaveFieldLayout(Event $e)
     {
-        $conditionals = craft()->request->getPost('_reasonsPlugin');
+
+        $conditionals = craft()->request->getPost('_reasonsConditionals');
+
         if ($conditionals) {
-            $fieldLayout = $e->params['layout'];
-            $conditionalsModel = new Reasons_ConditionalsModel();
-            $conditionalsModel->fieldLayoutId = $fieldLayout->id;
-            $conditionalsModel->conditionals = $conditionals;
-            craft()->reasons->saveConditionals($conditionalsModel);
+
+          // Get field layout
+          $fieldLayout = $e->params['layout'];
+          $fieldLayoutId = $fieldLayout->id;
+
+          // Create conditionals model
+          $model = new Reasons_ConditionalsModel();
+          $model->fieldLayoutId = $fieldLayoutId;
+          $model->conditionals = $conditionals;
+
+          // Save it
+          craft()->reasons->saveConditionals($model);
+
         }
+
         craft()->fileCache->delete($this->getCacheKey());
+
     }
 
 }

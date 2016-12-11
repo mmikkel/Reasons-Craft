@@ -1,8 +1,4 @@
-import each from 'lodash/each'
-import find from 'lodash/find'
-import reduce from 'lodash/reduce'
-import capitalize from 'lodash/capitalize'
-import objectAssign from 'object-assign'
+import { each, find, reduce, capitalize } from 'lib/lodash'
 
 import Reasons from 'reasons'
 
@@ -10,6 +6,7 @@ export default class Builder {
 
   static settings = {
     fieldId: null,
+    fieldRequired: null,
     toggleFields: null,
     conditionals: null,
     onChange: null
@@ -39,7 +36,7 @@ export default class Builder {
       .on('click', '.reasonsAddStatement', this.onAddStatementBtnClick.bind(this))
       .on('change', '.reasonsRuleToggleField select', this.onRuleToggleFieldChange.bind(this))
       .on('change', '.reasonsRuleCompare select', this.onRuleCompareChange.bind(this))
-      .on('change', '.reasonsRuleValue *:input', this.onRuleValueChange.bind(this))
+      .on('change blur keyup', '.reasonsRuleValue *:input', this.onRuleValueChange.bind(this))
 
     this.$ui.html('');
 
@@ -61,11 +58,11 @@ export default class Builder {
   }
 
   setSettings (settings) {
-    this.settings = objectAssign({}, this.settings || Builder.settings, settings)
+    this.settings = Object.assign({}, this.settings || Builder.settings, settings)
   }
 
   destroy () {
-    this.$container.off('click change')
+    this.$container.off('click change blur keyup')
     delete this.$container
     delete this.$ui
     delete this.$statement
@@ -94,16 +91,14 @@ export default class Builder {
 
   setToggleFields (fields) {
 
-    if (!fields) {
-      return false;
-    }
-
     let toggleFieldSelectOptions = ''
 
     this.settings.toggleFields = reduce(fields, (toggleFields, toggleField) => {
-      if (toggleField.id != this.fieldId) {
+      let toggleFieldId = toggleField.id.toString()
+      let fieldId = this.fieldId.toString()
+      if (toggleFieldId != fieldId) {
         toggleFieldSelectOptions += Builder.templates.toggleSelectOption(toggleField)
-        toggleField.id = toggleField.id.toString()
+        toggleField.id = toggleFieldId
         toggleFields.push(toggleField)
       }
       return toggleFields
@@ -118,7 +113,18 @@ export default class Builder {
     return find(this.settings.toggleFields || [], {id})
   }
 
-  render () {
+  render() {
+    this._doRender()
+    this.onChange()
+  }
+
+  _doRender () {
+
+    if (this.settings.fieldRequired) {
+      this.disable()
+      this.$message.text(Craft.t('This field is required and can\'t have conditionals.'))
+      return false
+    }
 
     this.settings.conditionals = [];
 
@@ -145,9 +151,10 @@ export default class Builder {
 
         let $rule = $(rule)
         let $toggleSelect = $rule.find('.reasonsRuleToggleField select')
-        let toggleSelectValue = parseInt($toggleSelect.val())
+        let toggleSelectValue = $toggleSelect.val().toString() // Toggle field ID
+        let toggleFieldAttributes = this.getToggleFieldById(toggleSelectValue)
 
-        if (!this.getToggleFieldById(toggleSelectValue)) {
+        if (!toggleFieldAttributes) {
           $rule.remove()
           return
         }
@@ -155,15 +162,31 @@ export default class Builder {
         // Re-render toggle select
         let toggleSelectOpts = ''
         each(toggleFields, (toggleField) => {
-          toggleSelectOpts += Builder.templates.toggleSelectOption(toggleField, parseInt(toggleField.id) === toggleSelectValue);
+          toggleSelectOpts += Builder.templates.toggleSelectOption(toggleField, toggleField.id.toString() === toggleSelectValue);
         })
         $toggleSelect.html(toggleSelectOpts)
+
+        // Re-render the rule value input
+        const $ruleValueContainer = $rule.find('.reasonsRuleValue')
+        const $ruleValueInput = $ruleValueContainer.find(':input')
+        const ruleValue = $ruleValueInput.val()
+        if ($ruleValueContainer.data('type') !== toggleFieldAttributes.type) {
+          // Jump ship and abort if the value input doesn't match the toggle field's type (i.e. the latter changed)
+          $rule.remove()
+          return
+        } else if (JSON.stringify($ruleValueContainer.data('settings')) !== JSON.stringify(toggleFieldAttributes.settings)) {
+          // Re-render rule value input if the settings changed
+          console.log('rule value --- ', ruleValue)
+          this.renderRuleValueContentForToggleSelect($toggleSelect, ruleValue)
+        }
+
+        // TODO: Filter the comparisons based on field type
 
         // Create the rule
         rules.push({
           fieldId: toggleSelectValue,
-          compare: $rule.find('.reasonsRuleCompare select').val(),
-          value: $rule.find('.reasonsRuleValue *:input:first').val()
+          value: ruleValue,
+          compare: $rule.find('.reasonsRuleCompare select').val()
         });
 
       })
@@ -177,122 +200,20 @@ export default class Builder {
 
     })
 
-    if (this.settings.onChange) {
-      this.settings.onChange()
-    }
-
   }
 
   getConditionals () {
-    return this.settings.conditionals && this.settings.conditionals.length > 0 ? this.settings.conditionals : false;
+    return !this.settings.fieldRequired && this.settings.toggleFields && this.settings.toggleFields.length && this.settings.conditionals && this.settings.conditionals.length > 0 ? this.settings.conditionals : false;
   }
 
-  addStatement (statement) {
+  renderRuleValueContentForToggleSelect ($select, ruleValue) {
 
-    statement = objectAssign({}, {
-      rules: false
-    }, statement)
-
-    const $statement = this.$statement.clone(true)
-    const rules = statement.rules;
-
-    // Append the statement
-    this.$ui.append($statement);
-
-    if (!rules) {
-
-        // This is a new statement. Just add a default rule
-        this.addRule({
-          target: $statement
-        });
-
-    } else {
-
-        each(rules, (rule) => {
-          this.addRule(objectAssign({}, {
-            target: $statement
-          }, rule))
-        })
-
-    }
-
-    return $statement;
-
-  }
-
-  addRule (rule) {
-
-    rule = objectAssign({}, {
-      fieldId: null,
-      compare: null,
-      value: null
-    }, rule)
-
-    const $rule = this.$rule.clone(true)
-    const $target = rule.target || this.$ui.find('.reasonsStatement:last')
-    const fieldId = rule.fieldId
-    const compare = rule.compare
-    const value = rule.value
-
-    if (!$target.length) {
-      return false
-    }
-
-    if (fieldId) {
-      $rule.find('.reasonsRuleToggleField select').val(fieldId)
-    }
-
-    $target.find('.reasonsRules:first').append($rule);
-    $rule.find('.reasonsRuleToggleField select').trigger('change')
-
-    if (compare) {
-        $rule.find('.reasonsRuleCompare select').val(compare);
-    }
-
-    if (value) {
-        $rule.find('.reasonsRuleValue *:input:first').val(value);
-    }
-
-    if (this.settings.onChange) {
-      this.settings.onChange();
-    }
-
-    return $rule;
-
-  }
-
-  onAddRuleBtnClick (e) {
-    e.preventDefault();
-    const target = $(e.currentTarget).closest('.reasonsStatement')
-    this.addRule({
-      target
-    });
-  }
-
-  onRemoveRuleBtnClick (e) {
-    e.preventDefault();
-    const $rule = $(e.currentTarget).closest('.reasonsRule')
-    $rule.remove();
-    this.render();
-  }
-
-  onAddStatementBtnClick (e) {
-    e.preventDefault();
-    this.addStatement();
-  }
-
-  onRuleToggleFieldChange (e) {
-
-    e.preventDefault();
-
-    // Render toggle value
-    const $target = $(e.currentTarget)
-    const toggleFieldId = $target.val()
+    const toggleFieldId = $select.val().toString()
     const toggleField = this.getToggleFieldById(toggleFieldId)
     const toggleFieldType = toggleField.type
     const toggleFieldSettings = toggleField.settings
 
-    const $rule = $target.parents('.reasonsRule')
+    const $rule = $select.closest('.reasonsRule')
     const $ruleValue = $rule.find('.reasonsRuleValue')
 
     let ruleValueContent = ''
@@ -370,16 +291,129 @@ export default class Builder {
 
     }
 
-    $ruleValue.html(ruleValueContent)
+    $ruleValue
+      .html(ruleValueContent)
+      .data({
+        settings: toggleFieldSettings,
+        type: toggleFieldType
+      })
 
+    if (ruleValue) $ruleValue.find(':input').val(ruleValue)
+
+  }
+
+  addStatement (statement) {
+
+    statement = Object.assign({}, {
+      rules: false
+    }, statement)
+
+    const $statement = this.$statement.clone(true)
+    const rules = statement.rules;
+
+    // Append the statement
+    this.$ui.append($statement);
+
+    if (!rules) {
+
+        // This is a new statement. Just add a default rule
+        this.addRule({
+          target: $statement
+        });
+
+    } else {
+
+        each(rules, (rule) => {
+          this.addRule(Object.assign({}, {
+            target: $statement
+          }, rule))
+        })
+
+    }
+
+    return $statement;
+
+  }
+
+  addRule (rule) {
+
+    rule = Object.assign({}, {
+      fieldId: null,
+      compare: null,
+      value: null
+    }, rule)
+
+    const $rule = this.$rule.clone(true)
+    const $target = rule.target || this.$ui.find('.reasonsStatement:last')
+    const fieldId = rule.fieldId
+    const compare = rule.compare
+    const value = rule.value
+
+    if (!$target.length) {
+      return false
+    }
+
+    if (fieldId) {
+      $rule.find('.reasonsRuleToggleField select').val(fieldId)
+    }
+
+    $target.find('.reasonsRules:first').append($rule);
+    $rule.find('.reasonsRuleToggleField select').trigger('change')
+
+    if (compare) {
+        $rule.find('.reasonsRuleCompare select').val(compare);
+    }
+
+    if (value) {
+        $rule.find('.reasonsRuleValue *:input:first').val(value);
+    }
+
+    return $rule;
+
+  }
+
+  onAddRuleBtnClick (e) {
+    e.preventDefault()
+    const target = $(e.currentTarget).closest('.reasonsStatement')
+    this.addRule({
+      target
+    })
+    this.render()
+  }
+
+  onRemoveRuleBtnClick (e) {
+    e.preventDefault()
+    const $rule = $(e.currentTarget).closest('.reasonsRule')
+    $rule.remove()
+    this.render()
+    this.render()
+  }
+
+  onAddStatementBtnClick (e) {
+    e.preventDefault()
+    this.addStatement()
+  }
+
+  onRuleToggleFieldChange (e) {
+    e.preventDefault();
+    this.renderRuleValueContentForToggleSelect($(e.currentTarget))
+    this.render()
   }
 
   onRuleCompareChange (e) {
     e.preventDefault()
+    this.render()
   }
 
   onRuleValueChange (e) {
     e.preventDefault()
+    this.render()
+  }
+
+  onChange () {
+    if (this.settings.onChange) {
+      this.settings.onChange();
+    }
   }
 
   static templates = {
@@ -404,7 +438,7 @@ export default class Builder {
     },
     input: function(settings) {
       var input = ''
-      settings = objectAssign({}, {
+      settings = Object.assign({}, {
         initialRows: 4,
         placeholder: '',
         multiline: false

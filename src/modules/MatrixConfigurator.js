@@ -1,22 +1,22 @@
-import reduce from 'lodash/reduce'
-import objectAssign from 'object-assign'
+import * as _ from 'lib/lodash'
 
 import Reasons from 'reasons'
 import Builder from 'modules/Builder'
 
-//import { OPTION_BASED_FIELDTYPES } from 'core/settings'
+// TODO: Add a warning when deleting fields or changing field type, if that field is a toggle field for conditionals
+// TODO: Handle errors on save! Put the conditionals in localStorage
 
 export default class MatrixConfigurator {
 
   constructor (matrixClass) {
 
-    const fn = matrixClass.prototype;
-    const fnInit = fn.init;
-    const self = this;
+    const self = this
+    const fn = matrixClass.prototype
 
+    const fnInit = fn.init
     fn.init = function () {
-      fnInit.apply(this, arguments);
-      self.init(this);
+      fnInit.apply(this, arguments)
+      self.init(this)
     }
 
   }
@@ -26,36 +26,60 @@ export default class MatrixConfigurator {
     this.configurator = configurator;
 
     // Init existing block types
-    for (var id in this.configurator.blockTypes) {
-      this.initBlockType(this.configurator.blockTypes[id])
+    this.blockTypes = {}
+    this.initBlockTypes()
+
+    // Make sure new block types are initialized
+    const self = this
+    const blockTypeSort = this.configurator.blockTypeSort
+    const addItems = blockTypeSort.addItems
+    blockTypeSort.addItems = function () {
+      addItems.apply(this, arguments)
+      self.initBlockTypes()
     }
 
   }
 
-  update () {
-
-
-
+  initBlockTypes () {
+    _.each(this.configurator.blockTypes, (blockType, id) => {
+      if (!this.blockTypes[id]) this.blockTypes[id] = this.initBlockType(blockType)
+    })
   }
 
   initBlockType (blockType) {
 
     const toggleFields = this.getToggleFieldsForBlockType(blockType)
 
+    // Make sure we have a block type ID we can work with – i.e. add the block type handle to any temporary ("new") ID
+    const blockTypeId = this.addHandleToNewBlockTypeId(blockType)
+
     if (!blockType._reasons) {
+
+      const conditionals = this.getConditionalsForBlockType(blockType) || {};
+
       blockType._reasons = {
-        // TODO: The input will store all conditionals for this block type
-        $input: $('<input type="hidden" name="types[Matrix][blockTypes]['+blockType.id+'][_reasonsPlugin]" value="" />').appendTo(blockType.$item),
+        $input: $('<input type="hidden" name="'+this.getInputName(blockTypeId)+'" value="" />').appendTo(blockType.$item),
+        conditionals,
         toggleFields
       }
+
+      // Override some methods
+      const self = this
+      const fnAddField = blockType.addField
+      blockType.addField = function () {
+        fnAddField.apply(this, arguments)
+        self.initBlockType(this)
+      }
+
     } else {
-      blockType._reasons = objectAssign({}, blockType._reasons, { toggleFields })
+      blockType._reasons = Object.assign({}, blockType._reasons, { toggleFields })
+      blockType._reasons.$input.attr('name', this.getInputName(blockTypeId))
     }
 
     // Init fields in block type
-    for (var id in blockType.fields) {
-      this.initField(blockType.fields[id])
-    }
+    _.each(blockType.fields, (field) => {
+      this.initField(field)
+    })
 
     return blockType;
 
@@ -67,73 +91,109 @@ export default class MatrixConfigurator {
     }
   }
 
-  onBlockTypeAdded () {
-    // TODO
-  }
-
-  onBlockTypeRemoved () {
-    // TODO
-  }
-
   initField (field) {
 
     const toggleFields = this.getToggleFieldsForField(field)
+    const fieldRequired = field.$requiredCheckbox.prop('checked')
 
     if (!field._reasons) {
+
+      const conditionals = this.getConditionalsForField(field)
 
       field._reasons = {
         builder: new Builder({
           fieldId: field.id,
           onChange: this.onConditionalsChange.bind(this, field),
-          conditionals: this.getConditionalsForField(field),
+          conditionals,
+          fieldRequired,
           toggleFields
         })
       }
 
       field.$fieldSettingsContainer
-        .on('change', ':input', this.onFieldSettingsChange.bind(this, field))
+        .on('change blur keyup', ':input', this.onFieldSettingsChange.bind(this, field))
+        .on('click keyup', '.lightswitch', this.onFieldSettingsChange.bind(this, field))
+        //.on('click', 'a[data-buttonbox-value]', this.onFieldSettingsChange.bind(this, field))
         .children('a.delete:last').before($('<div><hr /></div>').prepend(field._reasons.builder.get()));
+
+      const self = this
+      const fnSelfDestruct = field.selfDestruct
+      field.selfDestruct = function () {
+        fnSelfDestruct.apply(this, arguments)
+        self.destroyField(this)
+      }
+
+      // Override the stock `confirmDelete` method, in order to display a custom confirm dialog for toggle fields being removed
+      field.removeListener(field.$deleteBtn, 'click')
+      field.addListener(field.$deleteBtn, 'click', this.confirmDeleteField.bind(this, field))
+
+      // In a similar manner, override the stock `onTypeSelectChange` method
+      field.removeListener(field.$typeSelect, 'change')
+      field.addListener(field.$typeSelect, 'change', this.onTypeSelectChange.bind(this, field))
 
       this.onConditionalsChange(field)
 
     } else {
+
+      // Update the conditionals builder
       field._reasons.builder.update({
+        fieldRequired,
         toggleFields
       })
     }
 
   }
 
-  destroyField () {
-    if (field._reasons) {
-      field._reasons.builder.destroy()
-      delete field._reasons
+  confirmDeleteField (field) {
+    if (!this.isActiveToggleField(field)) {
+      field.confirmDelete()
+    } else if (confirm(Craft.t('Warning: Deleting this field will also delete all conditionals where the field is used as a toggle.\nAre you sure you want to delete this field?'))) {
+      field.selfDestruct()
     }
   }
 
-  onFieldSettingsChange (field) {
-    Garnish.requestAnimationFrame(() => {
+  onTypeSelectChange (field) {
+
+    const currentType = field.selectedFieldType
+    const desiredType = field.$typeSelect.val()
+    const isToggleField = this.isActiveToggleField(field)
+    const confirmDialog = 'Warning: Changing this field\'s type will delete all conditionals where the field is used as a toggle.\nAre you sure you want to change the fieldtype?'
+
+    if (desiredType == currentType || !isToggleField || confirm(Craft.t(confirmDialog))) {
+      field.setFieldType(desiredType)
+    } else {
+      field.setFieldType(currentType)
+    }
+
+  }
+
+  destroyField (field) {
+    if (field._reasons) {
+      field._reasons.builder.destroy()
+      delete field._reasons
+      field.$fieldSettingsContainer.off('change click keyup blur')
+      field.removeListener(field.$deleteBtn, 'click')
       this.initBlockType(field.blockType)
-    })
+    }
   }
 
-  onFieldAdded () {
-    // TODO
-  }
-
-  onFieldRemoved () {
-    // TODO
+  onFieldSettingsChange (field, e) {
+    e.stopPropagation()
+    if ($(e.currentTarget).closest('.reasonsBuilderUi').length) return false
+    this.initBlockType(field.blockType)
   }
 
   onConditionalsChange (field) {
     if (!field._reasons) return false
     const builder = field._reasons.builder
+    const conditionals = builder.getConditionals()
     const $el = field.$item
-    if (builder.getConditionals()) {
+    if (conditionals) {
       $el.addClass('js-reasons-has-conditionals')
     } else {
       $el.removeClass('js-reasons-has-conditionals')
     }
+    this.setConditionalsForField(field, conditionals)
   }
 
   /*
@@ -141,7 +201,7 @@ export default class MatrixConfigurator {
   *
   */
   getToggleFieldsForBlockType (blockType) {
-    return reduce(blockType.fields, (toggleFields, field) => {
+    return _.reduce(blockType.fields, (toggleFields, field) => {
       let toggleFieldData = this.getToggleFieldDataFromField(field)
       if (toggleFieldData) toggleFields.push(toggleFieldData)
       return toggleFields
@@ -149,7 +209,7 @@ export default class MatrixConfigurator {
   }
 
   getToggleFieldsForField (field) {
-    return reduce(field.blockType._reasons.toggleFields, (toggleFields, toggleField) => {
+    return _.reduce(field.blockType._reasons.toggleFields, (toggleFields, toggleField) => {
       if (toggleField.id != field.id) toggleFields.push(toggleField)
       return toggleFields
     }, [])
@@ -222,7 +282,7 @@ export default class MatrixConfigurator {
       // case 'ButtonBox_Width':
 
         var $settings = $settingsContainer.find('table:first tr')
-        var options = reduce($settings, (options, option) => {
+        var options = _.reduce($settings, (options, option) => {
           option = $(option)
           var value = option.find(':input[name$="[value]"]').val()
           var label = option.find(':input[name$="[label]"]').val()
@@ -238,7 +298,7 @@ export default class MatrixConfigurator {
       case 'PositionSelect':
 
         var $settings = $settingsContainer.find('table:first tr')
-        var options = reduce($settings, (options, option) => {
+        var options = _.reduce($settings, (options, option) => {
           var $input = $(option).find('input[type="hidden"]:first')
           var value = $input.attr('name').split('[').pop().replace(']', '')
           var enabled = $input.val() == 1
@@ -273,9 +333,85 @@ export default class MatrixConfigurator {
 
   }
 
-  getConditionalsForField () {
-    // TODO
-    return null;
+  /*
+  * Checks if a toggle field is part of any conditionals
+  *
+  */
+  isActiveToggleField (field) {
+    if (!field._reasons) return false
+    const blockType = field.blockType
+    if (!blockType._reasons) return false
+    const conditionals = blockType._reasons.conditionals || {}
+    return !!_.find(_.flattenDeep(_.values(conditionals)), { fieldId: field.id.toString() })
+  }
+
+  getConditionalsForBlockType (blockType) {
+    if (!parseInt(blockType.id)) return null;
+    return Reasons.getConditionalsForSource('matrixBlockType:'+blockType.id);
+  }
+
+  setConditionalsForField (field, conditionals) {
+
+    const blockType = field.blockType
+    if (!blockType._reasons) return false
+
+    const fieldId = field.id.toString()
+
+    // Get conditionals without the ones for the field we're working with
+    const blockTypeConditionals = _.omit(blockType._reasons.conditionals || {}, fieldId)
+
+    // Merge the new conditionals for our current field in (if there are conditionals)
+    if (conditionals) blockTypeConditionals[fieldId] = conditionals
+
+    // Cache the raw conditionals to the field's block type
+    blockType._reasons.conditionals = blockTypeConditionals
+
+    // ...and update the hidden input field
+    this.setConditionalsInput(blockType, blockTypeConditionals)
+
+  }
+
+  setConditionalsInput (blockType, conditionals) {
+
+    // Add field handles to new fields' temporary IDs
+    conditionals = _.reduce(conditionals, (conditionals, statements, fieldId) => {
+      fieldId = this.addHandleToNewFieldId(blockType, fieldId)
+      conditionals[fieldId] = _.reduce(statements, (statements, rules) => {
+        statements.push(_.reduce(rules, (rules, rule) => {
+          rules.push(_.mapValues(rule, (value, key) => {
+            return key === 'fieldId' ? this.addHandleToNewFieldId(blockType, value) : value
+          }))
+          return rules
+        }, []))
+        return statements
+      }, [])
+      return conditionals
+    }, {})
+
+    // Serialize the conditionals and update the hidden input
+    const serializedConditionals = Object.keys(conditionals).length ? JSON.stringify(conditionals) : ''
+    blockType._reasons.$input.val(serializedConditionals)
+
+  }
+
+  addHandleToNewBlockTypeId (blockType) {
+    return blockType.id.toString().substring(0, 3) === 'new' ? blockType.id+':'+blockType.$handleHiddenInput.val() : blockType.id
+  }
+
+  addHandleToNewFieldId (blockType, fieldId) {
+    if (!blockType.fields[fieldId]) return fieldId
+    return fieldId.toString().substring(0, 3) === 'new' ? fieldId+':'+blockType.fields[fieldId].$handleInput.val() : fieldId
+  }
+
+  getConditionalsForField (field) {
+    const blockType = field.blockType
+    if (!blockType._reasons) return null
+    const blockTypeConditionals = blockType._reasons.conditionals || {}
+    return blockTypeConditionals[field.id] || null
+  }
+
+  getInputName (blockTypeId) {
+    return '_reasonsMatrixConditionals[blockTypes]['+blockTypeId+']';
   }
 
 }

@@ -1,20 +1,18 @@
-# Reasons v. 1.1.0 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 2.0.0 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 _Supercharge your field layouts with conditionals._  
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
 
-Inspired by Advanced Custom Fields for WordPress, Reasons adds simple conditionals to field layouts – making it possible to hide or display fields on the fly, as content is being edited. This makes it fun and easy to create flexible, dynamic and usable field layouts in Craft CMS.  
+Reasons for Craft CMS adds conditionals to field layouts, making it possible to hide or show fields based on other fields' values – all while you're typin', selectin' and togglin' away at your content.  
+
+Reasons supports most stock FieldTypes, and works pretty much across the board (yes, even inside Matrix blocks). Craft Commerce is also fully supported.  
 
 _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good ideas that I stole, and helpful chatting on Slack. Thanks!_  
 
-## Recent updates
-* Full support for Craft Commerce
-* Support for Matrix fields
-
 ## Requirements
 
-**Reasons now requires Craft 2.5 or newer. Running Craft 2.4 or below? Don't attempt to install or update to Reasons 1.x – an older version supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
+**Reasons requires Craft 2.5 or newer. Running Craft 2.4 or below? An older version supporting Craft 2.4 and 2.3 is available in the [legacy branch](https://github.com/mmikkel/Reasons-Craft/tree/legacy).**  
 
 ## Installation
 
@@ -26,64 +24,37 @@ _Big props to [Benjamin Fleming](https://github.com/benjamminf) for some good id
 
 ![Setting up conditionals using the built-in field layout designer](http://g.recordit.co/R7Ti1xpL9Q.gif)  
 
-To create or edit conditionals for a certain field, go to the settings for the appropriate element source (i.e. the Entry Type, Category Group, Tag Group, Global Set or Asset source), click the little cogwheel next to the field in the Field Layout Designer and choose "Edit conditionals".  
+To create or edit conditionals, go to the settings for the appropriate element source, click the little cogwheel next to the field in the Field Layout Designer and choose "Edit conditionals".  
 
-Note that for element sources that support tabbed field layouts, Reasons is designed to work on a "per-tab" basis.  
+In Matrix blocks, you'll find the conditional builder snuggled away below the field settings panel.  
 
 ### What's a toggle field?
 
-A _toggle field_ in Reasons is a field that can be used to "toggle" another field (the _target field_) on or off (show or hide, as it were).  
-
-The following stock FieldTypes can be used as toggle fields:  
-
-* Lightswitch
-* Dropdown
-* Checkboxes
-* Multi-select
-* Radio Buttons
-* Number
-* Position Select
-* Plain Text
-* Entries
-* Categories
-* Tags
-* Assets
-* Users
-
-The following custom FieldTypes are also supported:  
-
-* [Solspace Events](https://solspace.com/craft/calendar)
-* [Button Box](http://plugins.supercooldesign.co.uk/plugin/button-box) (Buttons, Colours, Stars, Text Size and Width)
+A _toggle field_ in Reasons is a field that can be used to "toggle" another field on or off (show or hide, as it were). Most stock FieldTypes can be used as toggle fields.
 
 ### Where does it work?
 
-Reasons currently works for
+Reasons works for all stock element types (including Matrix blocks), Craft Commerce, Tag Manager and Solspace Calendar. Live Preview, drafts and Element Editor modals are also fully supported.
 
-* Entries
-* Categories
-* Tags
-* Assets
-* Users
-* Matrix
-* Tag Manager
-* Craft Commerce
-* [Solspace Calendar Events](https://solspace.com/craft/calendar)
+### Why does Craft even need conditionals?
 
-_Reasons also works in Live Preview, drafts and Element Editor modals._  
+Because sometimes, one field's value (or lack of a value) may render a different field redundant. Being able to hide redundant fields reduces cognitive strain for your content editors.  
 
-### A note on required fields
+### I don't get it.
 
-Be careful not to add conditionals to a _required_ field – **even if a required field is hidden, it'll still be required** by Craft; making your content impossible to save. I might add functionality to Reasons making it impossible to add conditionals to a required field, or possibly look at ways to override/avoid the `required` property if a field is hidden – but no promises :)
+The primary thing to understand about Reasons is that it's strictly about improving the content editing experience in Craft's Control Panel. It works as a thin layer on top of the CP UI, using JavaScript to show and hide fields as content is being edited.  
 
-### What Reasons _doesn't_ do – or a disclaimer of sorts
+Reasons does absolutely nothing to your content, nor does it affect your fields or field layouts in any way, shape or form. There is no front end layer.  
 
-It's important to realize that Reasons is _strictly about increasing editorial workflow usability_. It works as a thin layer on top of Craft's CP UI, using JavaScript to show and hide fields as content is edited.  
+### A fair warning
 
-_Reasons does absolutely nothing to your content, nor does it affect your fields or field layouts in any way_. This is in line with how conditionals in ACF (which inspired Reasons) work, but there's another, much more important reason (heh) I've decided to go this route.  
+It's important to know that Reasons is basically one huge hack (or rather, a collection of many small hacks). As Craft doesn't really expose an API for modifying the Control Panel, Reasons is dependent on markup/classnames, JavaScript workarounds and undocumented features in order to do its thing – which means that if P&T ever changes certain aspects of the Craft core or the CP UI, there's a chance Reasons will break.  
+
+
 
 First, a bit of history: When P&T opened up their feedback site in March 2015, I submitted a [a feature request for field layout conditionals](http://feedback.buildwithcraft.com/forums/285221-feature-requests/suggestions/7185745-conditionals-in-field-layouts). The request proved quite popular (it has in fact been the number one request since day one), and I decided to build Reasons to prove that this functionality would be both doable and worthwhile to add to Craft core.  
 
-As Craft doesn't really expose an API for modifying the Control Panel, Reasons is dependant on markup/classnames, Javascript workarounds and undocumented features in order to do its thing. This means that if P&T ever changes certain aspects of Craft (like they recently did with the CP redesign in Craft 2.5), Reasons is likely to break.  
+
 
 Also, I'm pretty sure Craft will have field layout conditionals in core one day – considering the feature request's popularity – and at that point, Reasons would be made redundant and I would stop working on it.  
 
@@ -111,11 +82,14 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 
 * [Added] Support for Matrix
 * [Added] Support for Craft Commerce (including variants)
-* [Added] Support for the Preparse custom fieldtype by @aelvan
+* [Added] Support for the Preparse custom FieldType by @aelvan
 * [Added] Ability for custom FieldTypes to add Reasons support
+* [Added] Conditionals can now be added to tabs
 * [Improved] Conditionals are no longer confined to tabs
-* [Improved] Basically rewrote the entire thing (the JavaScript part, anyway)
-* [Improved] It's now impossible to add conditionals to required fields
+* [Improved] Tabs with no visible fields are hidden
+* [Improved] More or less rewrote the whole thing, for a faster, better experience
+* [Improved] It's no longer possible to add conditionals to required fields
+* [Improved] Various minor bug fixes and improvements
 * [Fixed] Reasons now works with drafts
 
 #### 1.0.6 (07.10.2016)
