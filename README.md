@@ -1,5 +1,7 @@
 # Reasons v. 1.0.8 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
+## Update June 22nd, 2017: [Statement regarding Reasons 2, Matrix support and Craft 3](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3) (TL;DR: development on Reasons has been retired)  
+
 _Supercharge your field layouts with conditionals._  
 
 ![Using a Lightswitch to toggle between two different fields](http://g.recordit.co/nYxQIkpK0j.gif)  
@@ -95,6 +97,8 @@ My advice is to be smart about how you design your field layouts; always keeping
 ...and most importantly: [Vote for the feature request](http://feedback.buildwithcraft.com/forums/285221-feature-requests/suggestions/7185745-conditionals-in-field-layouts)! We'd all love to see field layout conditionals in Craft core.  
 
 ## Roadmap
+
+_Note: Development on Reasons has been retired – see [this statement](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3) for more info._  
 
 * Matrix support (in progress)
 * Craft Commerce support
