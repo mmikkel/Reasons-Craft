@@ -10,7 +10,6 @@ import MatrixInput from 'modules/MatrixInput'
 import ElementEditor from 'modules/ElementEditor'
 import Parser from 'modules/Parser'
 
-
 import 'styles/reasons.scss'
 import 'lib/jquery-extensions'
 
@@ -108,7 +107,7 @@ export default class Reasons {
 
   static getFieldIds (context) {
     context = context || 'global'
-    return Reasons.data.fieldIds && Reasons.data.fieldIds[context] ? Reasons.data.fieldIds[context] : {}
+    return Reasons.data.fields && Reasons.data.fields[context] ? Reasons.data.fields[context] : {}
   }
 
   static getFieldIdByHandle (fieldHandle, context) {

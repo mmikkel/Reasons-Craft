@@ -13,9 +13,7 @@ export default class MatrixInput {
     const fnInit = fn.init
     fn.init = function () {
       fnInit.apply(this, arguments)
-      Garnish.requestAnimationFrame(() => {
-        self.afterInit(this)
-      })
+      self.afterInit(this)
     }
 
   }
@@ -23,9 +21,13 @@ export default class MatrixInput {
   afterInit (matrixInput) {
 
     this.matrixInput = matrixInput;
-    this.fieldId = this.matrixInput.$container.closest('.field').data('id')
+
+    const handle = this.matrixInput.id.split('-').pop()
+    this.fieldId = Reasons.getFieldIdByHandle(handle)
 
     if (!this.fieldId) return false
+
+    console.log('matrix field after init', this.fieldId)
 
     // Init existing blocks
     const $blocks = this.matrixInput.$blockContainer.children()
@@ -51,13 +53,15 @@ export default class MatrixInput {
     // Get conditionals for this block
     const conditionals = this.getConditionalsForBlockType(blockType)
 
+    console.info('conds for block type', blockType)
+
     if (conditionals) {
 
       console.log('----')
       console.log('conditionals for block type', blockType, conditionals)
 
       $block.data('_reasons', Object.assign($block.data('_reasons'), {
-        parser: new Parser(block.$fieldsContainer, conditionals)
+        parser: new Parser(block.$fieldsContainer, conditionals)//, null, 'matrixBlockType:'+blockHandle)
       }))
 
       console.log('----')

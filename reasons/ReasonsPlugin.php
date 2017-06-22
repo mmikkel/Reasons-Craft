@@ -145,15 +145,13 @@ class ReasonsPlugin extends BasePlugin
       parent::init();
 
       if (!craft()->request->isCpRequest() || craft()->isConsole()) {
-          return false;
+        return false;
       }
 
       if (!$this->isCraftRequiredVersion()) {
-          craft()->userSession->setError(Craft::t('Reasons requires Craft 2.5 or newer, and has been disabled.'));
-          return false;
+        craft()->userSession->setError(Craft::t('Reasons requires Craft 2.5 or newer, and has been disabled.'));
+        return false;
       }
-
-      //Craft::import('plugins.reasons.helpers.ReasonsHelper');
 
       craft()->on('fields.saveFieldLayout', array($this, 'onSaveFieldLayout'));
 
@@ -161,8 +159,40 @@ class ReasonsPlugin extends BasePlugin
         $this->actionRequestInit();
       } else if (!craft()->request->isAjaxRequest()) {
         $this->includeResources();
-        craft()->templates->includeJs('Craft.ReasonsPlugin.init('.$this->getData().');');
+        craft()->templates->includeJs('Craft.ReasonsPlugin.init('.JsonHelper::encode(craft()->reasons->getData()).');');
       }
+
+    }
+
+    /*
+    *   Event handlers
+    *
+    */
+    /**
+     * @param Event $e
+     */
+    public function onSaveFieldLayout(Event $e)
+    {
+
+        $conditionals = craft()->request->getPost('_reasonsConditionals');
+
+        if ($conditionals) {
+
+          // Get field layout
+          $fieldLayout = $e->params['layout'];
+          $fieldLayoutId = $fieldLayout->id;
+
+          // Create conditionals model
+          $model = new Reasons_ConditionalsModel();
+          $model->fieldLayoutId = $fieldLayoutId;
+          $model->conditionals = $conditionals;
+
+          // Save it
+          craft()->reasons->saveConditionals($model);
+
+        }
+
+        craft()->fileCache->delete($this->getCacheKey());
 
     }
 
@@ -197,241 +227,9 @@ class ReasonsPlugin extends BasePlugin
 
     }
 
-    /**
-     *
-     */
     protected function includeResources()
     {
-        craft()->templates->includeJsResource('reasons/'.$this->getRevvedResource('reasons.js'));
-    }
-
-    /**
-     * @return string
-     */
-    protected function getData()
-    {
-        $doCacheData = !craft()->config->get('devMode');
-        $cacheKey = $this->getCacheKey();
-        $data = $doCacheData ? craft()->fileCache->get($cacheKey) : null;
-        if (!$data) {
-            $data = array(
-                'version' => $this->getVersion(),
-                'debug' => craft()->config->get('devMode'),
-                'conditionals' => $this->getConditionals(),
-                'toggleFieldTypes' => $this->getToggleFieldTypes(),
-                'toggleFields' => $this->getToggleFields(),
-                'fieldIds' => $this->getFieldIds(),
-            );
-            if ($doCacheData) {
-                craft()->fileCache->set($this->getCacheKey(), $data, 1800); // Cache for 30 minutes
-            }
-        }
-        return JsonHelper::encode($data);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getConditionals()
-    {
-
-        $r = array();
-        $sources = array();
-
-        // Entry types
-        $entryTypeRecords = EntryTypeRecord::model()->findAll();
-        if ($entryTypeRecords) {
-            foreach ($entryTypeRecords as $entryTypeRecord) {
-                $entryType = EntryTypeModel::populateModel($entryTypeRecord);
-                $sources['entryType:' . $entryType->id] = $entryType->fieldLayoutId;
-                $sources['section:' . $entryType->sectionId] = $entryType->fieldLayoutId;
-            }
-        }
-
-        // Category groups
-        $allCategoryGroups = craft()->categories->getAllGroups();
-        foreach ($allCategoryGroups as $categoryGroup) {
-            $sources['categoryGroup:' . $categoryGroup->id] = $categoryGroup->fieldLayoutId;
-        }
-
-        // Tag groups
-        $allTagGroups = craft()->tags->getAllTagGroups();
-        foreach ($allTagGroups as $tagGroup) {
-            $sources['tagGroup:' . $tagGroup->id] = $tagGroup->fieldLayoutId;
-        }
-
-        // Asset sources
-        $allAssetSources = craft()->assetSources->getAllSources();
-        foreach ($allAssetSources as $assetSource) {
-            $sources['assetSource:' . $assetSource->id] = $assetSource->fieldLayoutId;
-        }
-
-        // Global sets
-        $allGlobalSets = craft()->globals->getAllSets();
-        foreach ($allGlobalSets as $globalSet) {
-            $sources['globalSet:' . $globalSet->id] = $globalSet->fieldLayoutId;
-        }
-
-        // Matrix block types
-        $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
-        if ($matrixBlockTypeRecords) {
-            foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
-                $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
-                // This looks like a mess (well I guess the whole plugin does :D) but we need to be able to query blocks by both ID and handle so yeah
-                $fieldId = $matrixBlockType->fieldId;
-                $fieldLayoutId = $matrixBlockType->fieldLayoutId;
-                $sources['matrixBlockType:'.$matrixBlockType->id] = $fieldLayoutId;
-                $sources['matrixField:'.$fieldId.':'.$matrixBlockType->handle] = $fieldLayoutId;
-            }
-        }
-
-        // Users
-        $usersFieldLayout = craft()->fields->getLayoutByType(ElementType::User);
-        if ($usersFieldLayout) {
-            $sources['users'] = $usersFieldLayout->id;
-        }
-
-        // Solspace Calendar
-        $solspaceCalendarPlugin = craft()->plugins->getPlugin('calendar');
-        if ($solspaceCalendarPlugin && $solspaceCalendarPlugin->getDeveloper() === 'Solspace') {
-            $solspaceCalendarFieldLayout = craft()->fields->getLayoutByType('Calendar_Event');
-            if ($solspaceCalendarFieldLayout) {
-                $sources['solspaceCalendar'] = $solspaceCalendarFieldLayout->id;
-            }
-        }
-
-        // Commerce – TODO
-        // $commercePlugin = craft()->plugins->getPlugin('commerce');
-        // if ($commercePlugin && $commercePlugin->getDeveloper() === 'Pixel & Tonic') {
-        //     // Product types
-        //     $productTypes = craft()->commerce_productTypes->getAllProductTypes();
-        //     if ($productTypes) {
-        //         foreach ($productTypes as $productType) {
-        //             $sources['commerceProductType:'.$productType->id] =
-        //         }
-        //     }
-        // }
-
-        // Get all conditionals
-        $conditionals = array();
-        $conditionalsRecords = Reasons_ConditionalsRecord::model()->findAll();
-        if ($conditionalsRecords) {
-            foreach ($conditionalsRecords as $conditionalsRecord) {
-                $conditionalsModel = Reasons_ConditionalsModel::populateModel($conditionalsRecord);
-                if ($conditionalsModel->conditionals && $conditionalsModel->conditionals != '') {
-                    $conditionals['fieldLayout:' . $conditionalsModel->fieldLayoutId] = $conditionalsModel->conditionals;
-                }
-            }
-        }
-
-        // Map conditionals to sources
-        foreach ($sources as $sourceId => $fieldLayoutId) {
-            if (isset($conditionals['fieldLayout:' . $fieldLayoutId])) {
-                $r[$sourceId] = $conditionals['fieldLayout:' . $fieldLayoutId];
-            }
-        }
-
-        return $r;
-
-    }
-
-    /**
-     * @return array
-     */
-    protected function getToggleFieldTypes()
-    {
-
-        $stockFieldTypes = array(
-            'Lightswitch',
-            'Dropdown',
-            'Checkboxes',
-            'MultiSelect',
-            'RadioButtons',
-            'Number',
-            'PositionSelect',
-            'PlainText',
-            'Entries',
-            'Categories',
-            'Tags',
-            'Assets',
-            'Users',
-        );
-
-        $customFieldTypes = array(
-            'Calendar_Event',
-            'ButtonBox_Buttons',
-            'ButtonBox_Colours',
-            'ButtonBox_Stars',
-            'ButtonBox_TextSize',
-            'ButtonBox_Width',
-            'PreparseField_Preparse',
-        );
-
-        $fieldTypes = array_merge($stockFieldTypes, $customFieldTypes);
-
-        $additionalFieldTypes = craft()->plugins->call('defineAdditionalReasonsToggleFieldTypes', array(), true);
-
-        foreach ($additionalFieldTypes as $pluginHandle => $pluginFieldTypes) {
-            $fieldTypes = array_merge($fieldTypes, $pluginFieldTypes);
-        }
-
-        return $fieldTypes;
-
-    }
-
-    /*
-    *   Returns all toggleable fields
-    *
-    */
-    /**
-     * @return array
-     */
-    protected function getToggleFields()
-    {
-        $toggleFieldTypes = $this->getToggleFieldTypes();
-        $toggleFields = array();
-        $fields = craft()->fields->getAllFields();
-        foreach ($fields as $field) {
-            $fieldType = $field->getFieldType();
-            $classHandle = $fieldType && is_object($fieldType) && $fieldType->classHandle ? $fieldType->classHandle : false;
-            if (!$classHandle) {
-                continue;
-            }
-            if (in_array($classHandle, $toggleFieldTypes)) {
-                $toggleFields[] = array(
-                    'id' => $field->id,
-                    'handle' => $field->handle,
-                    'name' => $field->name,
-                    'type' => $classHandle,
-                    //'contentAttribute' => $fieldType->defineContentAttribute() ?: false,
-                    'settings' => $field->settings,
-                );
-            }
-        }
-        return $toggleFields;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFieldIds()
-    {
-        $fields = array();
-        // Using a custom DB query because that's the only way I figured to include Matrix block type fields
-        $fieldRecords = craft()->db->createCommand()
-                          ->select('id, handle, context')
-                          ->from('fields')
-                          ->queryAll();
-        if ($fieldRecords) {
-          foreach ($fieldRecords as $fieldRecord) {
-            $context = $fieldRecord['context'];
-            if (!isset($fields[$context])) {
-              $fields[$context] = array();
-            }
-            $fields[$context][$fieldRecord['handle']] = $fieldRecord['id'];
-          }
-        }
-        return $fields;
+      craft()->templates->includeJsResource('reasons/'.$this->getRevvedResource('reasons.js'));
     }
 
     /**
@@ -439,8 +237,8 @@ class ReasonsPlugin extends BasePlugin
      */
     protected function getRevisionManifest()
     {
-        $manifestPath = craft()->path->getPluginsPath().'/reasons/resources/rev-manifest.json';
-        return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? JsonHelper::decode($manifest) : false;
+      $manifestPath = craft()->path->getPluginsPath().'/reasons/resources/rev-manifest.json';
+      return (IOHelper::fileExists($manifestPath) && $manifest = IOHelper::getFileContents($manifestPath)) ? JsonHelper::decode($manifest) : false;
     }
 
     protected function getRevvedResource($src)
@@ -454,39 +252,7 @@ class ReasonsPlugin extends BasePlugin
      */
     public function getCacheKey()
     {
-        return $this->_pluginName.'_'.$this->_version.'_'.$this->_schemaVersion;
-    }
-
-    /*
-    *   Event handlers
-    *
-    */
-    /**
-     * @param Event $e
-     */
-    public function onSaveFieldLayout(Event $e)
-    {
-
-        $conditionals = craft()->request->getPost('_reasonsConditionals');
-
-        if ($conditionals) {
-
-          // Get field layout
-          $fieldLayout = $e->params['layout'];
-          $fieldLayoutId = $fieldLayout->id;
-
-          // Create conditionals model
-          $model = new Reasons_ConditionalsModel();
-          $model->fieldLayoutId = $fieldLayoutId;
-          $model->conditionals = $conditionals;
-
-          // Save it
-          craft()->reasons->saveConditionals($model);
-
-        }
-
-        craft()->fileCache->delete($this->getCacheKey());
-
+      return $this->_pluginName.'_'.$this->_version.'_'.$this->_schemaVersion;
     }
 
 }
