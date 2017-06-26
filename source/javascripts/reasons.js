@@ -18,7 +18,6 @@
         USERS_HANDLE :              'users',
         FIELDS_HANDLE :             'field',
         SOLSPACE_CALENDAR_HANDLE :  'solspaceCalendar',
-        //COMMERCE_PRODUCT_TYPE_HANDLE : 'commerceProductType',
 
         ASSET_SOURCE_ACTION :       'assetSources/saveSource',
         CATEGORY_ACTION :           'categories/saveCategory',
@@ -33,9 +32,8 @@
         USERS_FIELDS_ACTION :       'users/saveFieldLayout',
         FIELDS_ACTION :             'fields/saveField',
         SOLSPACE_CALENDAR_EVENTS_ACTION :  'calendar/events/saveEvent',
-        SOLSPACE_CALENDAR_SETTINGS_ACTION : 'calendar/settings/saveSettings',
-        // COMMERCE_PRODUCT_TYPE_ACTION : 'commerce/productTypes/saveProductType',
-        // COMMERCE_PRODUCT_ACTION : 'commerce/products/saveProduct',
+        SOLSPACE_CALENDAR_SETTINGS_ACTION: 'calendar/calendars/saveCalendar',
+        SOLSPACE_CALENDAR_LEGACY_SETTINGS_ACTION : 'calendar/settings/saveSettings', // Solspace Calendar < 1.7.0
 
         RENDER_CONTEXT :            'render',
         LAYOUT_DESIGNER_CONTEXT :   'fld',
@@ -259,9 +257,18 @@
                     idInputSelector = 'input[type="hidden"][name="fieldId"]';
                     break;
 
-                case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
+                case this.SOLSPACE_CALENDAR_LEGACY_SETTINGS_ACTION :
+                    type = this.SOLSPACE_CALENDAR_HANDLE;
+                    break;
+
                 case this.SOLSPACE_CALENDAR_EVENTS_ACTION :
                     type = this.SOLSPACE_CALENDAR_HANDLE;
+                    idInputSelector = 'input[type="hidden"][name="calendarEvent[calendarId]"]';
+                    break;
+
+                case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
+                    type = this.SOLSPACE_CALENDAR_HANDLE;
+                    idInputSelector = 'input[type="hidden"][name="calendarId"]';
                     break;
 
                 case this.COMMERCE_PRODUCT_TYPE_ACTION :
@@ -309,6 +316,7 @@
                 case this.ENTRY_TYPE_ACTION :
                 case this.TAG_GROUP_ACTION :
                 case this.USERS_FIELDS_ACTION :
+                case this.SOLSPACE_CALENDAR_LEGACY_SETTINGS_ACTION :
                 case this.SOLSPACE_CALENDAR_SETTINGS_ACTION :
                 case this.COMMERCE_PRODUCT_TYPE_ACTION :
                     return this.LAYOUT_DESIGNER_CONTEXT;

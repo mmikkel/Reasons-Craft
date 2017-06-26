@@ -328,15 +328,6 @@ class ReasonsPlugin extends BasePlugin
             $sources['globalSet:' . $globalSet->id] = $globalSet->fieldLayoutId;
         }
 
-        // Matrix blocks – TODO
-        // $matrixBlockTypeRecords = MatrixBlockTypeRecord::model()->findAll();
-        // if ($matrixBlockTypeRecords) {
-        //     foreach ($matrixBlockTypeRecords as $matrixBlockTypeRecord) {
-        //         $matrixBlockType = MatrixBlockTypeModel::populateModel($matrixBlockTypeRecord);
-        //         $sources['matrixBlockType:' . $matrixBlockType->id] = $matrixBlockType->fieldLayoutId;
-        //     }
-        // }
-
         // Users
         $usersFieldLayout = craft()->fields->getLayoutByType(ElementType::User);
         if ($usersFieldLayout) {
@@ -346,23 +337,21 @@ class ReasonsPlugin extends BasePlugin
         // Solspace Calendar
         $solspaceCalendarPlugin = craft()->plugins->getPlugin('calendar');
         if ($solspaceCalendarPlugin && $solspaceCalendarPlugin->getDeveloper() === 'Solspace') {
-            $solspaceCalendarFieldLayout = craft()->fields->getLayoutByType('Calendar_Event');
-            if ($solspaceCalendarFieldLayout) {
-                $sources['solspaceCalendar'] = $solspaceCalendarFieldLayout->id;
+            // Before 1.7.0, Solspace Calendar used a single Field Layout for all calendars. Let's try and support both the old and the new
+            if (version_compare($solspaceCalendarPlugin->getVersion(), '1.7.0', '>=')) {
+                $solspaceCalendars = craft()->calendar_calendars->getAllCalendars();
+                if ($solspaceCalendars && is_array($solspaceCalendars) && !empty($solspaceCalendars)) {
+                    foreach ($solspaceCalendars as $solspaceCalendar) {
+                        $sources['solspaceCalendar:'.$solspaceCalendar->id] = $solspaceCalendar->fieldLayoutId;
+                    }
+                }
+            } else {
+                $solspaceCalendarFieldLayout = craft()->fields->getLayoutByType('Calendar_Event');
+                if ($solspaceCalendarFieldLayout) {
+                    $sources['solspaceCalendar'] = $solspaceCalendarFieldLayout->id;
+                }
             }
         }
-
-        // Commerce – TODO
-        // $commercePlugin = craft()->plugins->getPlugin('commerce');
-        // if ($commercePlugin && $commercePlugin->getDeveloper() === 'Pixel & Tonic') {
-        //     // Product types
-        //     $productTypes = craft()->commerce_productTypes->getAllProductTypes();
-        //     if ($productTypes) {
-        //         foreach ($productTypes as $productType) {
-        //             $sources['commerceProductType:'.$productType->id] =
-        //         }
-        //     }
-        // }
 
         // Get all conditionals
         $conditionals = array();
