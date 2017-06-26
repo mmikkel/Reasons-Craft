@@ -18,7 +18,7 @@
 class ReasonsPlugin extends BasePlugin
 {
 
-    protected $_version = '1.0.8';
+    protected $_version = '1.0.9';
     protected $_schemaVersion = '1.1';
     protected $_developer = 'Mats Mikkel Rummelhoff';
     protected $_developerUrl = 'http://mmikkel.no';
@@ -144,7 +144,7 @@ class ReasonsPlugin extends BasePlugin
 
         parent::init();
 
-        if (!craft()->request->isCpRequest() || craft()->isConsole()) {
+        if (!craft()->request->isCpRequest() || !craft()->userSession->getUser() || craft()->isConsole()) {
             return false;
         }
 
