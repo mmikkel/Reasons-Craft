@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.0.9",
+    "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+    "date": "2017-06-26T10:00:00-08:00",
+    "notes": [
+      "[Fixed] Fixes issue where Reasons would leak configuration data on the login screen",
+      "[Fixed] Fixes support for Solspace Calendar newer than 1.7.0"
+    ]
+  },
+  {
     "version": "1.0.8",
     "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
     "date": "2016-11-19T10:00:00-08:00",
