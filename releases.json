@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.0.10",
+    "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+    "date": "2017-06-26T11:00:00-08:00",
+    "notes": [
+      "[Fixed] Fixes issue where Reasons would not work with drafts/entry revisions"
+    ]
+  },
+  {
     "version": "1.0.9",
     "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
     "date": "2017-06-26T10:00:00-08:00",

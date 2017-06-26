@@ -27,6 +27,7 @@
         GLOBAL_SET_CONTENT_ACTION : 'globals/saveContent',
         GLOBAL_SET_ACTION :         'globals/saveSet',
         ENTRY_ACTION :              'entries/saveEntry',
+        ENTRY_REVISION_ACTION :     'entryRevisions/saveDraft',
         ENTRY_TYPE_ACTION :         'sections/saveEntryType',
         USERS_ACTION :              'users/saveUser',
         USERS_FIELDS_ACTION :       'users/saveFieldLayout',
@@ -231,6 +232,7 @@
                     break;
 
                 case this.ENTRY_ACTION :
+                case this.ENTRY_REVISION_ACTION :
                     var $entryType = $form.find('select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType');
                     type = $entryType.length ? this.ENTRY_TYPE_HANDLE : this.SECTION_HANDLE;
                     idInputSelector = $entryType.length ? 'select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType' : 'input[type="hidden"][name="sectionId"], #' + namespace + 'section';
@@ -303,6 +305,7 @@
 
                 case this.GLOBAL_SET_CONTENT_ACTION :
                 case this.ENTRY_ACTION :
+                case this.ENTRY_REVISION_ACTION :
                 case this.TAG_ACTION :
                 case this.CATEGORY_ACTION :
                 case this.USERS_ACTION :
