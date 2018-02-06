@@ -1,6 +1,6 @@
 # Reasons v. 1.0.11 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
-## Update June 22nd, 2017: [Statement regarding Reasons 2, Matrix support and Craft 3](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3) (TL;DR: development on Reasons has been retired)  
+## Update June 22nd, 2017: [Statement regarding Reasons 2, Matrix support and Craft 3](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3) (TL;DR: active development on Reasons has been retired)  
 
 _Supercharge your field layouts with conditionals._  
 
