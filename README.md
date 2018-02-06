@@ -1,4 +1,4 @@
-# Reasons v. 1.0.10 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
+# Reasons v. 1.0.11 for Craft CMS ![Craft 2.5](https://img.shields.io/badge/craft-2.5-red.svg?style=flat-square)
 
 ## Update June 22nd, 2017: [Statement regarding Reasons 2, Matrix support and Craft 3](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3) (TL;DR: development on Reasons has been retired)  
 
@@ -113,6 +113,10 @@ Please report any bugs, feature requests or other issues [here](https://github.c
 **Pull requests are extremely welcome**  
 
 ### Changelog
+
+#### 1.0.11 (02.06.2018)
+
+* [Fixed] Fixes an issue where Reasons would not work in Craft 2.6.3007 or newer
 
 #### 1.0.10 (26.06.2017)
 

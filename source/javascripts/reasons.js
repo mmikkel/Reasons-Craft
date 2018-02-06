@@ -58,10 +58,12 @@
         initPrimaryForm : function ()
         {
             this.destroyPrimaryForm();
-            var $form = (Craft.cp.$primaryForm && Craft.cp.$primaryForm.length) ? Craft.cp.$primaryForm : $('#content form:first');
-            if ($form && $form.length) {
-                this.primaryForm = this.initForm($form);
-            }
+            Garnish.requestAnimationFrame((function () {
+                var $form = (Craft.cp.$primaryForm && Craft.cp.$primaryForm.length) ? Craft.cp.$primaryForm : $('#content form:first');
+                if ($form && $form.length) {
+                    this.primaryForm = this.initForm($form);
+                }
+            }).bind(this));
         },
 
         destroyPrimaryForm : function ()

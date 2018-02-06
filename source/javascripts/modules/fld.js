@@ -4,8 +4,13 @@ module.exports = class {
 
     constructor ($el, conditionals)
     {
-        
+
+        if (!$el || !$el.length) {
+            return;
+        }
+
         this.$el = $el;
+
         this.conditionals = conditionals;
         
         this.settings = {
@@ -33,10 +38,6 @@ module.exports = class {
     init ()
     {
         
-        // Get form
-        this.$form = this.$el.closest(this.settings.formSelector);
-        if (!this.$form || this.$form.length === 0) return false;
-
         // Get available toggle field IDs
         var toggleFields = Craft.ReasonsPlugin.getToggleFields();
         this.toggleFieldIds = $.map(toggleFields, function(toggleField){
@@ -57,7 +58,7 @@ module.exports = class {
         }));
 
         // Append the hidden input fields
-        this.$form
+        this.$el
             .append(this.$conditionalsInput)
             .append(this.$conditionalsIdInput)
             // Attach submit event listener

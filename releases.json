@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.0.11",
+    "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
+    "date": "2018-02-06T11:00:00-08:00",
+    "notes": [
+      "[Fixed] Fixes an issue where Reasons would not work in Craft 2.6.3007 or newer"
+    ]
+  },
+  {
     "version": "1.0.10",
     "downloadUrl": "https://github.com/mmikkel/Reasons-Craft/archive/master.zip",
     "date": "2017-06-26T11:00:00-08:00",
